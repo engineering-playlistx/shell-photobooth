@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { usePhotobooth } from "../contexts/PhotoboothContext";
 import { getAssetPath } from "../utils/assets";
 
-const VIDEO_VERTICAL_OFFSET = [318, 798];
+const VIDEO_VERTICAL_OFFSET = 540;
 const MAX_RETAKE_COUNT = 2;
 
 function CameraPage() {
@@ -27,9 +27,7 @@ function CameraPage() {
   const videoAspectRatio = 9 / 16;
   const videoHeight = canvasHeight * (480 / canvasHeight);
   const videoWidth = videoHeight / videoAspectRatio;
-  const [verticalOffset, setVerticalOffset] = useState(
-    VIDEO_VERTICAL_OFFSET[0],
-  );
+  const verticalOffset = VIDEO_VERTICAL_OFFSET;
 
   useEffect(() => {
     void handleStartCamera();
@@ -101,36 +99,16 @@ function CameraPage() {
         );
         context.restore();
       } else {
-        capturedPhotosRef.current.forEach((photoImage, index) => {
-          if (photoImage && photoImage.complete) {
-            const centerX = (canvasWidth - videoWidth) / 2;
-            context.drawImage(
-              photoImage,
-              centerX,
-              VIDEO_VERTICAL_OFFSET[index],
-              videoWidth,
-              videoHeight,
-            );
-          }
-        });
-
-        if (
-          capturedPhotosRef.current.length === 1 &&
-          video &&
-          video.readyState === 4
-        ) {
-          context.save();
-          context.translate(canvasWidth, 0);
-          context.scale(-1, 1);
+        const photoImage = capturedPhotosRef.current[0];
+        if (photoImage && photoImage.complete) {
           const centerX = (canvasWidth - videoWidth) / 2;
           context.drawImage(
-            video,
+            photoImage,
             centerX,
-            verticalOffset,
+            VIDEO_VERTICAL_OFFSET,
             videoWidth,
             videoHeight,
           );
-          context.restore();
         }
       }
 
@@ -294,20 +272,16 @@ function CameraPage() {
     const photoImage = new window.Image();
     photoImage.src = photoData;
     photoImage.onload = () => {
-      capturedPhotosRef.current.push(photoImage);
-      setCapturedPhotos((prev) => [...prev, photoData]);
+      capturedPhotosRef.current = [photoImage];
+      setCapturedPhotos([photoData]);
 
-      if (capturedPhotosRef.current.length === 1) {
-        setVerticalOffset(VIDEO_VERTICAL_OFFSET[1]);
-      } else if (capturedPhotosRef.current.length === 2) {
-        if (streamRef.current) {
-          streamRef.current.getTracks().forEach((track) => {
-            track.stop();
-          });
-          streamRef.current = null;
-        }
-        setIsCameraActive(false);
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((track) => {
+          track.stop();
+        });
+        streamRef.current = null;
       }
+      setIsCameraActive(false);
     };
   }
 
@@ -351,19 +325,11 @@ function CameraPage() {
     }
 
     setRetakeCount((prev) => prev + 1);
-    capturedPhotosRef.current.pop();
-    setCapturedPhotos((prev) => prev.slice(0, -1));
+    capturedPhotosRef.current = [];
+    setCapturedPhotos([]);
 
-    if (capturedPhotosRef.current.length === 0) {
-      setVerticalOffset(VIDEO_VERTICAL_OFFSET[0]);
-      if (!isCameraActive && streamRef.current === null) {
-        void handleStartCamera();
-      }
-    } else if (capturedPhotosRef.current.length === 1) {
-      setVerticalOffset(VIDEO_VERTICAL_OFFSET[1]);
-      if (!isCameraActive && streamRef.current === null) {
-        void handleStartCamera();
-      }
+    if (!isCameraActive && streamRef.current === null) {
+      void handleStartCamera();
     }
   }
 
@@ -382,7 +348,7 @@ function CameraPage() {
 
     setOriginalPhotos(capturedPhotos);
 
-    void navigate("/quiz");
+    void navigate("/form");
   }
 
   return (
@@ -492,7 +458,7 @@ function CameraPage() {
                   onClick={handleCapturePhoto}
                   className="size-24 lg:size-48 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed select-none"
                   disabled={
-                    capturedPhotos.length >= 2 ||
+                    capturedPhotos.length >= 1 ||
                     !isCameraActive ||
                     countdown !== null
                   }
@@ -544,7 +510,7 @@ function CameraPage() {
                   onClick={handleNext}
                   className="flex flex-col items-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed select-none"
                   aria-label="Next"
-                  disabled={capturedPhotos.length < 2}
+                  disabled={capturedPhotos.length < 1}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" || e.key === " ") {
                       e.preventDefault();

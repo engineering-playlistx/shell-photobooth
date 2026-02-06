@@ -17,7 +17,7 @@ function convertToCSV(data: PhotoResultDocument[]): string {
     "Name",
     "Email",
     "Phone",
-    "Archetype",
+    "Theme",
     "Photo Path",
     "Created At",
     "Updated At",
@@ -28,7 +28,7 @@ function convertToCSV(data: PhotoResultDocument[]): string {
     escapeCSVValue(item.userInfo.name),
     escapeCSVValue(item.userInfo.email),
     escapeCSVValue(item.userInfo.phone),
-    escapeCSVValue(item.quizResult.archetype),
+    escapeCSVValue(item.selectedTheme?.theme ?? ""),
     escapeCSVValue(item.photoPath),
     escapeCSVValue(item.createdAt),
     escapeCSVValue(item.updatedAt),
@@ -57,7 +57,7 @@ function downloadCSV(csvContent: string, filename: string) {
 
 export default function DataPage() {
   const navigate = useNavigate();
-  const { setFinalPhoto, setQuizResult, setUserInfo } = usePhotobooth();
+  const { setFinalPhoto, setSelectedTheme, setUserInfo } = usePhotobooth();
   const [data, setData] = useState<PhotoResultDocument[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -72,7 +72,7 @@ export default function DataPage() {
       reader.onloadend = () => {
         const base64 = reader.result as string;
         setFinalPhoto(base64);
-        setQuizResult(item.quizResult);
+        setSelectedTheme(item.selectedTheme);
         setUserInfo(item.userInfo);
         void navigate("/result");
       };
@@ -196,7 +196,7 @@ export default function DataPage() {
                       Phone
                     </th>
                     <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
-                      Archetype
+                      Theme
                     </th>
                     <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
                       Photo Path
@@ -234,7 +234,7 @@ export default function DataPage() {
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-900">
                         <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs font-medium">
-                          {item.quizResult.archetype}
+                          {item.selectedTheme?.theme ?? "N/A"}
                         </span>
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-900 font-mono text-xs max-w-xs truncate">

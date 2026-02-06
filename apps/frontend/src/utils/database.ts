@@ -1,10 +1,10 @@
-import type { Archetype } from "../contexts/PhotoboothContext";
+import type { RacingTheme } from "../contexts/PhotoboothContext";
 
 export interface PhotoResultDocument {
   id: string;
   photoPath: string;
-  quizResult: {
-    archetype: Archetype;
+  selectedTheme: {
+    theme: RacingTheme;
   };
   userInfo: {
     name: string;

@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiPhotoRouteImport } from './routes/api.photo'
+import { Route as ApiAiGenerateRouteImport } from './routes/api.ai-generate'
 import { Route as DemoStartServerFuncsRouteImport } from './routes/demo/start.server-funcs'
 import { Route as DemoStartApiRequestRouteImport } from './routes/demo/start.api-request'
 import { Route as DemoSentryTestingRouteImport } from './routes/demo/sentry.testing'
@@ -28,6 +29,11 @@ const IndexRoute = IndexRouteImport.update({
 const ApiPhotoRoute = ApiPhotoRouteImport.update({
   id: '/api/photo',
   path: '/api/photo',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAiGenerateRoute = ApiAiGenerateRouteImport.update({
+  id: '/api/ai-generate',
+  path: '/api/ai-generate',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DemoStartServerFuncsRoute = DemoStartServerFuncsRouteImport.update({
@@ -73,6 +79,7 @@ const DemoStartSsrDataOnlyRoute = DemoStartSsrDataOnlyRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/api/ai-generate': typeof ApiAiGenerateRoute
   '/api/photo': typeof ApiPhotoRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/sentry/testing': typeof DemoSentryTestingRoute
@@ -85,6 +92,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/api/ai-generate': typeof ApiAiGenerateRoute
   '/api/photo': typeof ApiPhotoRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/sentry/testing': typeof DemoSentryTestingRoute
@@ -98,6 +106,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/api/ai-generate': typeof ApiAiGenerateRoute
   '/api/photo': typeof ApiPhotoRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/sentry/testing': typeof DemoSentryTestingRoute
@@ -112,6 +121,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/api/ai-generate'
     | '/api/photo'
     | '/demo/api/names'
     | '/demo/sentry/testing'
@@ -124,6 +134,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/api/ai-generate'
     | '/api/photo'
     | '/demo/api/names'
     | '/demo/sentry/testing'
@@ -136,6 +147,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/api/ai-generate'
     | '/api/photo'
     | '/demo/api/names'
     | '/demo/sentry/testing'
@@ -149,6 +161,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ApiAiGenerateRoute: typeof ApiAiGenerateRoute
   ApiPhotoRoute: typeof ApiPhotoRoute
   DemoApiNamesRoute: typeof DemoApiNamesRoute
   DemoSentryTestingRoute: typeof DemoSentryTestingRoute
@@ -174,6 +187,13 @@ declare module '@tanstack/react-router' {
       path: '/api/photo'
       fullPath: '/api/photo'
       preLoaderRoute: typeof ApiPhotoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/ai-generate': {
+      id: '/api/ai-generate'
+      path: '/api/ai-generate'
+      fullPath: '/api/ai-generate'
+      preLoaderRoute: typeof ApiAiGenerateRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/demo/start/server-funcs': {
@@ -237,6 +257,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ApiAiGenerateRoute: ApiAiGenerateRoute,
   ApiPhotoRoute: ApiPhotoRoute,
   DemoApiNamesRoute: DemoApiNamesRoute,
   DemoSentryTestingRoute: DemoSentryTestingRoute,

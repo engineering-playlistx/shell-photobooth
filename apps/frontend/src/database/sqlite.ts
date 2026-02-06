@@ -45,7 +45,7 @@ export function savePhotoResultToSQLite(document: PhotoResultDocument): void {
   stmt.run(
     document.id,
     document.photoPath,
-    JSON.stringify(document.quizResult),
+    JSON.stringify(document.selectedTheme),
     JSON.stringify(document.userInfo),
     document.createdAt,
     document.updatedAt,
@@ -64,7 +64,7 @@ export function getAllPhotoResultsFromSQLite(): PhotoResultDocument[] {
     return {
       id: r.id as string,
       photoPath: r.photo_path as string,
-      quizResult: JSON.parse(r.quiz_result as string),
+      selectedTheme: JSON.parse(r.quiz_result as string),
       userInfo: JSON.parse(r.user_info as string),
       createdAt: r.created_at as string,
       updatedAt: r.updated_at as string,
@@ -86,7 +86,7 @@ export function getPhotoResultByIdFromSQLite(
   return {
     id: row.id as string,
     photoPath: row.photo_path as string,
-    quizResult: JSON.parse(row.quiz_result as string),
+    selectedTheme: JSON.parse(row.quiz_result as string),
     userInfo: JSON.parse(row.user_info as string),
     createdAt: row.created_at as string,
     updatedAt: row.updated_at as string,

@@ -1,290 +1,131 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  ARCHETYPES,
-  CONTENT_TYPES,
-  usePhotobooth,
-} from "../contexts/PhotoboothContext";
-import type { Archetype } from "../contexts/PhotoboothContext";
+import { usePhotobooth } from "../contexts/PhotoboothContext";
+import type { RacingTheme } from "../contexts/PhotoboothContext";
 import { getAssetPath } from "../utils/assets";
 
-const VIDOE_VERTICAL_OFFSET = [318, 798];
-const LOADING_DURATION = process.env.NODE_ENV === "development" ? 1000 : 15000;
+// TODO: Fix eslint
+const API_BASE_URL =
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (import.meta as any).env?.VITE_API_BASE_URL || "http://localhost:3000";
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const API_CLIENT_KEY = (import.meta as any).env?.VITE_API_CLIENT_KEY || "";
 
-function getFrameNumberFromArchetype(archetype: Archetype): number {
-  return Object.keys(ARCHETYPES).findIndex((key) => key === archetype) + 1;
-}
+const FRAME_MAP: Record<RacingTheme, string> = {
+  pitcrew: "/images/frame-racing-pitcrew.png",
+  motogp: "/images/frame-racing-motogp.png",
+  f1: "/images/frame-racing-f1.png",
+};
 
-function getWrappedLines(
-  context: CanvasRenderingContext2D,
-  text: string,
-  maxWidth: number,
-): string[] {
-  const words = text.split(" ");
-  let line = "";
-  const lines: string[] = [];
-  for (let n = 0; n < words.length; n++) {
-    const testLine = line + words[n] + " ";
-    const testWidth = context.measureText(testLine).width;
-    if (testWidth > maxWidth && line.length > 0) {
-      lines.push(line.trim());
-      line = words[n] + " ";
-    } else {
-      line = testLine;
-    }
-  }
-  if (line.trim().length > 0) {
-    lines.push(line.trim());
-  }
-  return lines;
-}
-
-function drawWrappedLines(
-  context: CanvasRenderingContext2D,
-  lines: string[],
-  x: number,
-  y: number,
-  lineHeight: number,
-): number {
-  lines.forEach((l, idx) => {
-    context.fillText(l, x, y + idx * lineHeight);
+function loadImage(src: string): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const img = new window.Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = src;
   });
-  return y + lines.length * lineHeight;
+}
+
+async function applyRacingFrame(
+  aiGeneratedBase64: string,
+  theme: RacingTheme,
+): Promise<string> {
+  const canvasWidth = 1280;
+  const canvasHeight = 1920;
+
+  const canvas = document.createElement("canvas");
+  canvas.width = canvasWidth;
+  canvas.height = canvasHeight;
+  const ctx = canvas.getContext("2d");
+
+  if (!ctx) {
+    throw new Error("Failed to get canvas context");
+  }
+
+  const [aiImage, frameImage] = await Promise.all([
+    loadImage(aiGeneratedBase64),
+    loadImage(getAssetPath(FRAME_MAP[theme])),
+  ]);
+
+  ctx.drawImage(aiImage, 0, 0, canvasWidth, canvasHeight);
+  ctx.drawImage(frameImage, 0, 0, canvasWidth, canvasHeight);
+
+  return canvas.toDataURL("image/png");
 }
 
 function LoadingPage() {
   const navigate = useNavigate();
-  const { originalPhotos, quizResult, setFinalPhoto } = usePhotobooth();
+  const { originalPhotos, selectedTheme, setFinalPhoto } = usePhotobooth();
   const [progress, setProgress] = useState(0);
-  const intervalRef = useRef<number | null>(null);
-  const startTimeRef = useRef<number | null>(null);
+  const [statusText, setStatusText] = useState("Preparing your photo...");
+  const [error, setError] = useState<string | null>(null);
   const processedRef = useRef(false);
 
   useEffect(() => {
-    if (
-      processedRef.current ||
-      !originalPhotos.length ||
-      !quizResult ||
-      originalPhotos.length < 2
-    ) {
+    if (processedRef.current || !originalPhotos.length || !selectedTheme) {
       return;
     }
 
-    const currentQuizResult = quizResult;
+    processedRef.current = true;
 
-    async function processImageWithFrame() {
-      const frameNumber = getFrameNumberFromArchetype(
-        currentQuizResult.archetype,
-      );
-      const isDarkBackground =
-        currentQuizResult.archetype === "chill" ||
-        currentQuizResult.archetype === "night";
-      const framePath = getAssetPath(`/images/frame-${frameNumber}.png`);
-
-      const canvasWidth = 1280;
-      const canvasHeight = 1920;
-      const videoAspectRatio = 9 / 16;
-      const videoHeight = canvasHeight * (480 / canvasHeight);
-      const videoWidth = videoHeight / videoAspectRatio;
-
-      const canvas = document.createElement("canvas");
-      canvas.width = canvasWidth;
-      canvas.height = canvasHeight;
-      const context = canvas.getContext("2d");
-
-      if (!context) {
-        return;
-      }
-
-      const loadImage = (src: string): Promise<HTMLImageElement> => {
-        return new Promise((resolve, reject) => {
-          const img = new window.Image();
-          img.crossOrigin = "anonymous";
-          img.onload = () => resolve(img);
-          img.onerror = reject;
-          img.src = src;
-        });
-      };
-
+    async function generateAIPhoto() {
       try {
-        const [photo1, photo2, frameImage] = await Promise.all([
-          loadImage(originalPhotos[0]),
-          loadImage(originalPhotos[1]),
-          loadImage(framePath),
-        ]);
+        setStatusText("Uploading photo...");
+        setProgress(15);
 
-        context.clearRect(0, 0, canvas.width, canvas.height);
+        const response = await fetch(`${API_BASE_URL}/api/ai-generate`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${API_CLIENT_KEY}`,
+          },
+          body: JSON.stringify({
+            userPhotoBase64: originalPhotos[0],
+            theme: selectedTheme!.theme,
+          }),
+        });
 
-        const centerX = (canvasWidth - videoWidth) / 2;
+        setStatusText("AI is generating your photo...");
+        setProgress(50);
 
-        context.drawImage(
-          photo1,
-          centerX,
-          VIDOE_VERTICAL_OFFSET[0],
-          videoWidth,
-          videoHeight,
-        );
+        const data = await response.json();
 
-        context.drawImage(
-          photo2,
-          centerX,
-          VIDOE_VERTICAL_OFFSET[1],
-          videoWidth,
-          videoHeight,
-        );
-
-        context.drawImage(frameImage, 0, 0, canvas.width, canvas.height);
-
-        if (isDarkBackground) {
-          context.fillStyle = "#ffffff";
-        } else {
-          context.fillStyle = "#3f2b2e";
-        }
-        context.textAlign = "center";
-        context.textBaseline = "middle";
-
-        const contents = ARCHETYPES[currentQuizResult.archetype].contents;
-        const contentKeys = Object.keys(contents);
-        if (contentKeys.length >= 2) {
-          const shuffledKeys = contentKeys
-            .map((key) => ({ key, sort: Math.random() }))
-            .sort((a, b) => a.sort - b.sort)
-            .map(({ key }) => key);
-          const randomKey1 = shuffledKeys[0];
-          const randomKey2 = shuffledKeys[1];
-
-          const items1 = contents[randomKey1 as keyof typeof contents];
-          const items2 = contents[randomKey2 as keyof typeof contents];
-
-          const text1 =
-            Array.isArray(items1) && items1.length > 0
-              ? items1[Math.floor(Math.random() * items1.length)]
-              : "";
-          const text2 =
-            Array.isArray(items2) && items2.length > 0
-              ? items2[Math.floor(Math.random() * items2.length)]
-              : "";
-
-          const maxTextWidth = canvasWidth * 0.45;
-
-          const sectionSpacing = 12;
-          const typeSpacing = 8;
-          const lineHeight = 44;
-
-          const type1 = CONTENT_TYPES[randomKey1 as keyof typeof CONTENT_TYPES];
-          const type2 = CONTENT_TYPES[randomKey2 as keyof typeof CONTENT_TYPES];
-
-          context.textAlign = "center";
-          context.textBaseline = "middle";
-
-          context.font = "bold italic 36px LOccitaneSerif";
-          const type1Lines = getWrappedLines(context, type1, maxTextWidth);
-
-          context.font = "italic 36px LOccitaneSerif";
-          const text1Lines = getWrappedLines(context, text1, maxTextWidth);
-
-          context.font = "bold italic 36px LOccitaneSerif";
-          const type2Lines = getWrappedLines(context, type2, maxTextWidth);
-
-          context.font = "italic 36px LOccitaneSerif";
-          const text2Lines = getWrappedLines(context, text2, maxTextWidth);
-
-          const totalLines =
-            type1Lines.length +
-            text1Lines.length +
-            type2Lines.length +
-            text2Lines.length;
-
-          const maxLines = 6;
-
-          const textInitialY =
-            canvasHeight * (3 / 4) +
-            sectionSpacing * 2 +
-            Math.max(0, maxLines - totalLines - 1) * (lineHeight / 2);
-          let currY = textInitialY;
-
-          context.font = "bold italic 36px LOccitaneSerif";
-          currY = drawWrappedLines(
-            context,
-            type1Lines,
-            canvasWidth / 2,
-            currY + typeSpacing,
-            lineHeight,
-          );
-
-          context.font = "italic 36px LOccitaneSerif";
-          currY = drawWrappedLines(
-            context,
-            text1Lines,
-            canvasWidth / 2,
-            currY + typeSpacing,
-            lineHeight,
-          );
-
-          currY += sectionSpacing;
-
-          context.font = "bold italic 36px LOccitaneSerif";
-          currY = drawWrappedLines(
-            context,
-            type2Lines,
-            canvasWidth / 2,
-            currY + typeSpacing,
-            lineHeight,
-          );
-
-          context.font = "italic 36px LOccitaneSerif";
-          drawWrappedLines(
-            context,
-            text2Lines,
-            canvasWidth / 2,
-            currY + typeSpacing,
-            lineHeight,
-          );
+        if (!response.ok) {
+          throw new Error(data.error || "Failed to generate photo");
         }
 
-        const finalPhotoData = canvas.toDataURL("image/png");
-        setFinalPhoto(finalPhotoData);
-        processedRef.current = true;
-      } catch (error) {
-        console.error("Error processing image:", error);
+        setStatusText("Applying racing frame...");
+        setProgress(80);
+
+        const framedPhoto = await applyRacingFrame(
+          data.generatedImageBase64,
+          selectedTheme!.theme,
+        );
+
+        setProgress(100);
+        setFinalPhoto(framedPhoto);
+
+        setTimeout(() => {
+          void navigate("/result");
+        }, 500);
+      } catch (err) {
+        console.error("AI generation failed:", err);
+        const message =
+          err instanceof Error ? err.message : "Something went wrong";
+        setError(message);
+        processedRef.current = false;
       }
     }
 
-    void processImageWithFrame();
-  }, [originalPhotos, quizResult, setFinalPhoto]);
+    void generateAIPhoto();
+  }, [originalPhotos, selectedTheme, setFinalPhoto, navigate]);
 
-  useEffect(() => {
+  const handleRetry = () => {
+    setError(null);
     setProgress(0);
-    startTimeRef.current = Date.now();
-
-    const updateProgress = () => {
-      if (startTimeRef.current === null) return;
-
-      const elapsed = Date.now() - startTimeRef.current;
-      const newProgress = Math.min((elapsed / LOADING_DURATION) * 100, 100);
-      setProgress(newProgress);
-
-      if (newProgress >= 100) {
-        if (intervalRef.current !== null) {
-          window.clearInterval(intervalRef.current);
-          intervalRef.current = null;
-        }
-        // @ts-expect-error - for debugging
-        window.navigate = navigate;
-        void navigate("/result");
-      }
-    };
-
-    intervalRef.current = window.setInterval(updateProgress, 16);
-
-    return () => {
-      if (intervalRef.current !== null) {
-        window.clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-      startTimeRef.current = null;
-    };
-  }, []);
+    processedRef.current = false;
+  };
 
   return (
     <div className="h-svh aspect-9/16 mx-auto relative flex items-center justify-center p-4 bg-black overflow-hidden">
@@ -296,19 +137,42 @@ function LoadingPage() {
       >
         <source src={getAssetPath("/videos/kv2.mp4")} type="video/mp4" />
       </video>
-      <div className="absolute bottom-40 left-1/2 transform -translate-x-1/2 w-5/6 px-8 z-10">
-        <div className="relative w-full h-20 rounded-xl bg-secondary overflow-hidden shadow-lg">
-          <div
-            className="absolute top-0 left-0 h-full bg-primary transition-all duration-75 ease-linear rounded-lg"
-            style={{ width: `${progress}%` }}
-          />
-          <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-white font-sans font-medium text-3xl">
-              Loading
-            </span>
+
+      {error ? (
+        <div className="relative z-10 flex flex-col items-center gap-8 px-12">
+          <p className="text-white text-3xl font-sans text-center">{error}</p>
+          <div className="flex gap-6">
+            <button
+              type="button"
+              onClick={handleRetry}
+              className="px-10 py-5 bg-white hover:bg-gray-200 text-secondary rounded-lg font-medium text-3xl transition-all duration-200 cursor-pointer font-sans"
+            >
+              Try Again
+            </button>
+            <button
+              type="button"
+              onClick={() => void navigate("/")}
+              className="px-10 py-5 bg-transparent hover:bg-white/20 text-white border border-white rounded-lg font-medium text-3xl transition-all duration-200 cursor-pointer font-sans"
+            >
+              Back to Home
+            </button>
           </div>
         </div>
-      </div>
+      ) : (
+        <div className="absolute bottom-40 left-1/2 transform -translate-x-1/2 w-5/6 px-8 z-10">
+          <div className="relative w-full h-20 rounded-xl bg-secondary overflow-hidden shadow-lg">
+            <div
+              className="absolute top-0 left-0 h-full bg-primary transition-all duration-300 ease-linear rounded-lg"
+              style={{ width: `${progress}%` }}
+            />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="text-white font-sans font-medium text-3xl">
+                {statusText}
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

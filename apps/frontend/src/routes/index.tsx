@@ -6,7 +6,7 @@ function IndexPage() {
   const navigate = useNavigate();
 
   function handleOpenCamera() {
-    void navigate("/camera");
+    void navigate("/select");
   }
 
   useEffect(() => {

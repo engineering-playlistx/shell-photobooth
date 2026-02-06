@@ -37,7 +37,7 @@ function base64ToBlob(base64: string, contentType = "", sliceSize = 512) {
 }
 
 export default function ResultPage() {
-  const { finalPhoto, quizResult, userInfo } = usePhotobooth();
+  const { finalPhoto, selectedTheme, userInfo } = usePhotobooth();
   const navigate = useNavigate();
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -92,7 +92,7 @@ export default function ResultPage() {
   };
 
   const emailResult = async () => {
-    if (!finalPhoto || !quizResult || !userInfo) return;
+    if (!finalPhoto || !selectedTheme || !userInfo) return;
 
     setIsSubmitting(true);
 
@@ -221,7 +221,7 @@ export default function ResultPage() {
 
   // Auto-save photo result to database when page loads
   useEffect(() => {
-    if (hasSaved.current || !finalPhoto || !quizResult || !userInfo) {
+    if (hasSaved.current || !finalPhoto || !selectedTheme || !userInfo) {
       return;
     }
 
@@ -234,7 +234,7 @@ export default function ResultPage() {
 
         await savePhotoResult({
           photoPath,
-          quizResult,
+          selectedTheme,
           userInfo,
         });
 
@@ -274,7 +274,7 @@ export default function ResultPage() {
     };
 
     void saveToDatabase();
-  }, [finalPhoto, quizResult, userInfo, photoFileName]);
+  }, [finalPhoto, selectedTheme, userInfo, photoFileName]);
 
   return (
     <div className="h-svh aspect-9/16 mx-auto relative flex items-center justify-center bg-primary text-secondary">
@@ -288,7 +288,7 @@ export default function ResultPage() {
       <div className="relative z-10 w-full px-36 lg:px-40 mx-auto">
         <div className="flex flex-col items-center gap-12">
           <div className="w-full h-[70vh] pt-48 lg:pt-36">
-            {!!finalPhoto && !!quizResult && (
+            {!!finalPhoto && !!selectedTheme && (
               <img
                 src={finalPhoto}
                 // src="/images/_for-testing/frame-1.png"

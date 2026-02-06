@@ -5,7 +5,7 @@ import { PhotoboothProvider } from "./contexts/PhotoboothContext";
 import RootLayout from "./layouts/RootLayout";
 import IndexPage from "./routes/index";
 import CameraPage from "./routes/camera";
-import QuizPage from "./routes/quiz";
+import SelectPage from "./routes/select";
 import FormPage from "./routes/form";
 import LoadingPage from "./routes/loading";
 import ResultPage from "./routes/result";
@@ -31,8 +31,8 @@ root.render(
         <Routes>
           <Route path="/" element={<RootLayout />}>
             <Route index element={<IndexPage />} />
+            <Route path="/select" element={<SelectPage />} />
             <Route path="/camera" element={<CameraPage />} />
-            <Route path="/quiz" element={<QuizPage />} />
             <Route path="/form" element={<FormPage />} />
             <Route path="/loading" element={<LoadingPage />} />
             <Route path="/result" element={<ResultPage />} />
