@@ -19,13 +19,13 @@ function IndexPage() {
       <div
         className="absolute inset-0 w-full h-full px-26 pb-20 pt-76"
         style={{
-          background: `url('${getAssetPath("/images/frame-video-start.png")}')`,
+          background: `url('${getAssetPath("/images/home-image.png")}')`,
           backgroundSize: "cover",
         }}
       >
-        <video autoPlay loop playsInline className="w-full h-full object-cover">
+        {/* <video autoPlay loop playsInline className="w-full h-full object-cover">
           <source src={getAssetPath("/videos/kv1.mp4")} type="video/mp4" />
-        </video>
+        </video> */}
       </div>
       <div className="w-full text-center absolute bottom-48 left-1/2 -translate-x-1/2 z-10">
         <div className="flex flex-col items-center gap-4">
