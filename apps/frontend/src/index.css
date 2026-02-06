@@ -1,0 +1,106 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: "LOccitaneSans";
+  src: url("/fonts/LOccitaneSans-Light.ttf") format("truetype");
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "LOccitaneSans";
+  src: url("/fonts/LOccitaneSans-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "LOccitaneSans";
+  src: url("/fonts/LOccitaneSans-Medium.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "LOccitaneSans";
+  src: url("/fonts/LOccitaneSans-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "LOccitaneSans";
+  src: url("/fonts/LOccitaneSans-Italic.ttf") format("truetype");
+  font-weight: 400;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "LOccitaneSans";
+  src: url("/fonts/LOccitaneSans-BoldItalic.ttf") format("truetype");
+  font-weight: 700;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "LOccitaneSerif";
+  src: url("/fonts/LOccitaneSerif-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "LOccitaneSerif";
+  src: url("/fonts/LOccitaneSerif-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "LOccitaneSerif";
+  src: url("/fonts/LOccitaneSerif-Italic.ttf") format("truetype");
+  font-weight: 400;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "LOccitaneSerif";
+  src: url("/fonts/LOccitaneSerif-BoldItalic.ttf") format("truetype");
+  font-weight: 700;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "LOccitaneSerifCondensed";
+  src: url("/fonts/LOccitaneSerifCondensed-Medium.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+}
+
+@theme {
+  --color-primary: #ffc700;
+  --color-secondary: #3f2b2e;
+  --color-tertiary: #9c774d;
+  --color-milk-white: #f2e9da;
+  --font-family-sans: "LOccitaneSans", sans-serif;
+  --font-family-serif: "LOccitaneSerif", serif;
+}
+
+body {
+  font-family: var(--font-family-serif), serif;
+}
+
+@keyframes slide-up {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.3s ease-out;
+}
