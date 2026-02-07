@@ -5,7 +5,7 @@ import { getSupabaseAdminClient } from '../utils/supabase-admin'
 import type { RacingTheme } from '../services/ai-generation.service'
 
 const VALID_THEMES: Array<RacingTheme> = ['pitcrew', 'motogp', 'f1']
-const SUPABASE_BUCKET = 'loccitane-photobooth'
+const SUPABASE_BUCKET = 'photobooth-bucket'
 
 interface RequestBody {
   userPhotoBase64: string

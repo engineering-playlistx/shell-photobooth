@@ -94,8 +94,8 @@ We're converting it into an **AI-generated racing photobooth**: user picks a rac
 - Initialize Replicate client with `process.env.REPLICATE_API_KEY`
 - Map theme → template image URL (from env vars: `RACING_TEMPLATE_PITCREW_URL`, etc.)
 - Method `generateFaceSwap({ userPhotoUrl, theme })`:
-  - Calls Replicate face-swap model (e.g. `lucataco/face-swap`)
-  - Input: `source_image` (user photo URL), `target_image` (racing template URL)
+  - Calls Replicate `google/nano-banana-pro` model with face-swap prompt
+  - Input: `prompt` (face-swap instruction), `image_input` array (user photo URL + template URL)
   - Returns generated image URL
 - Method to download result and convert to base64
 

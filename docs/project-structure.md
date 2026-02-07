@@ -339,7 +339,7 @@ usecases/submit-photo.ts     # Business logic — orchestrates the flow
 ├── 1. Convert finalPhoto base64 → Blob
 │
 ├── 2. Upload to Supabase Storage
-│      Bucket: "loccitane-photobooth"
+│      Bucket: "photobooth-bucket"
 │      Path:   "public/{uuid}-{sanitized-name}.png"
 │
 ├── 3. HTTP POST → {API_BASE_URL}/api/photo
@@ -361,7 +361,7 @@ usecases/submit-photo.ts     # Business logic — orchestrates the flow
 │      → Uses Supabase admin client (service key)
 │
 ├── 8. Get public URL for uploaded photo
-│      → supabase.storage.from('loccitane-photobooth').getPublicUrl(path)
+│      → supabase.storage.from('photobooth-bucket').getPublicUrl(path)
 │
 ├── 9. EmailService.sendPhotoResult()
 │      → Resend API call
@@ -410,7 +410,7 @@ usecases/submit-photo.ts     # Business logic — orchestrates the flow
 | Web (admin)  | `web/src/utils/supabase-admin.ts`| Service role key | Database writes (users table) |
 | Web (server) | `web/src/utils/supabase.ts`      | Anon key     | SSR session management     |
 
-**Storage bucket:** `loccitane-photobooth`
+**Storage bucket:** `photobooth-bucket`
 **Upload path pattern:** `public/{uuid}-{sanitized-name}.png`
 
 **Database table (`users`):**

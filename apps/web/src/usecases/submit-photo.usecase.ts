@@ -2,7 +2,7 @@ import { UserRepository } from '../repositories/user.repository'
 import { EmailService } from '../services/email.service'
 import { getSupabaseAdminClient } from '../utils/supabase-admin'
 
-const SUPABASE_BUCKET = 'loccitane-photobooth'
+const SUPABASE_BUCKET = 'photobooth-bucket'
 
 export interface SubmitPhotoRequest {
   photoPath: string
