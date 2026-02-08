@@ -1,3 +1,4 @@
+import path from 'node:path'
 import { defineConfig } from 'vite'
 import { devtools } from '@tanstack/devtools-vite'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
@@ -8,6 +9,11 @@ import { nitro } from 'nitro/vite'
 // import { cloudflare } from '@cloudflare/vite-plugin'
 
 const config = defineConfig({
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    },
+  },
   plugins: [
     devtools(),
     nitro(),
@@ -16,6 +22,7 @@ const config = defineConfig({
     viteTsConfigPaths({
       projects: ['./tsconfig.json'],
     }),
+    // @ts-expect-error - Tailwind has its own Vite version causing type conflicts
     tailwindcss(),
     tanstackStart(),
     viteReact(),
