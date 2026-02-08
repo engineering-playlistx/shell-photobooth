@@ -51,6 +51,12 @@ export const Route = createFileRoute('/api/ai-generate')({
 
           const userPhotoBase64 = body.userPhotoBase64
           const theme = body.theme
+          const requestStart = Date.now()
+
+          console.log(`[ai-generate] Request received — theme: ${theme}`)
+          console.log(
+            `[ai-generate] Photo payload size: ${Math.round(userPhotoBase64.length / 1024)}KB`,
+          )
 
           if (!VALID_THEMES.includes(theme)) {
             return json(
@@ -61,7 +67,7 @@ export const Route = createFileRoute('/api/ai-generate')({
             )
           }
 
-          // Upload user photo to Supabase to get a public URL for Replicate
+          console.log(`[ai-generate] Uploading photo to Supabase temp storage`)
           const supabase = getSupabaseAdminClient()
           const photoId = crypto.randomUUID()
           const tempPath = `temp/${photoId}.png`
@@ -109,19 +115,26 @@ export const Route = createFileRoute('/api/ai-generate')({
             data: { publicUrl: userPhotoUrl },
           } = supabase.storage.from(SUPABASE_BUCKET).getPublicUrl(tempPath)
 
-          // Call Replicate face swap
+          console.log(`[ai-generate] Temp photo URL: ${userPhotoUrl}`)
+          console.log(`[ai-generate] Calling Replicate face swap...`)
+
           const aiService = new AIGenerationService()
           const generatedImageUrl = await aiService.generateFaceSwap({
             userPhotoUrl,
             theme,
           })
 
-          // Download the generated image and convert to base64
+          console.log(`[ai-generate] Downloading generated image...`)
           const generatedImageBase64 =
             await aiService.downloadAsBase64(generatedImageUrl)
 
-          // Clean up temp photo
+          console.log(`[ai-generate] Cleaning up temp photo`)
           await supabase.storage.from(SUPABASE_BUCKET).remove([tempPath])
+
+          const totalTime = ((Date.now() - requestStart) / 1000).toFixed(1)
+          console.log(
+            `[ai-generate] Done — total: ${totalTime}s, response size: ${Math.round(generatedImageBase64.length / 1024)}KB`,
+          )
 
           return json({ generatedImageBase64 })
         } catch (error) {

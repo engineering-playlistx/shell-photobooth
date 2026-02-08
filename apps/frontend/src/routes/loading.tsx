@@ -22,7 +22,10 @@ function loadImage(src: string): Promise<HTMLImageElement> {
     const img = new window.Image();
     img.crossOrigin = "anonymous";
     img.onload = () => resolve(img);
-    img.onerror = reject;
+    img.onerror = () => {
+      const label = src.startsWith("data:") ? "base64 image" : src;
+      reject(new Error(`Failed to load image: ${label}`));
+    };
     img.src = src;
   });
 }
@@ -43,13 +46,18 @@ async function applyRacingFrame(
     throw new Error("Failed to get canvas context");
   }
 
-  const [aiImage, frameImage] = await Promise.all([
-    loadImage(aiGeneratedBase64),
-    loadImage(getAssetPath(FRAME_MAP[theme])),
-  ]);
-
+  const aiImage = await loadImage(aiGeneratedBase64);
   ctx.drawImage(aiImage, 0, 0, canvasWidth, canvasHeight);
-  ctx.drawImage(frameImage, 0, 0, canvasWidth, canvasHeight);
+
+  // Frame overlay is optional — skip if the image file doesn't exist
+  try {
+    const frameImage = await loadImage(getAssetPath(FRAME_MAP[theme]));
+    ctx.drawImage(frameImage, 0, 0, canvasWidth, canvasHeight);
+  } catch {
+    console.warn(
+      `[AI Generate] Frame image not found: ${FRAME_MAP[theme]} — skipping overlay`,
+    );
+  }
 
   return canvas.toDataURL("image/png");
 }
@@ -71,8 +79,17 @@ function LoadingPage() {
 
     async function generateAIPhoto() {
       try {
+        const theme = selectedTheme!.theme;
+        const photoSize = Math.round(originalPhotos[0].length / 1024);
+        console.log(
+          `[AI Generate] Starting — theme: ${theme}, photo size: ${photoSize}KB`,
+        );
+        console.log(`[AI Generate] API URL: ${API_BASE_URL}/api/ai-generate`);
+
         setStatusText("Uploading photo...");
         setProgress(15);
+
+        const startTime = Date.now();
 
         const response = await fetch(`${API_BASE_URL}/api/ai-generate`, {
           method: "POST",
@@ -82,25 +99,63 @@ function LoadingPage() {
           },
           body: JSON.stringify({
             userPhotoBase64: originalPhotos[0],
-            theme: selectedTheme!.theme,
+            theme,
           }),
         });
+
+        const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+        console.log(
+          `[AI Generate] Response received — status: ${response.status} (${elapsed}s)`,
+        );
 
         setStatusText("AI is generating your photo...");
         setProgress(50);
 
-        const data = await response.json();
+        const rawText = await response.text();
+        console.log(
+          `[AI Generate] Response body length: ${rawText.length} chars`,
+        );
+
+        let data: Record<string, unknown>;
+        try {
+          data = JSON.parse(rawText) as Record<string, unknown>;
+        } catch {
+          console.error(
+            "[AI Generate] Failed to parse JSON. Raw response:",
+            rawText.substring(0, 500),
+          );
+          throw new Error(
+            `Server returned invalid JSON (status ${response.status})`,
+          );
+        }
 
         if (!response.ok) {
-          throw new Error(data.error || "Failed to generate photo");
+          console.error("[AI Generate] API error:", data);
+          throw new Error((data.error as string) || "Failed to generate photo");
         }
+
+        if (!data.generatedImageBase64) {
+          console.error(
+            "[AI Generate] Missing generatedImageBase64 in response. Keys:",
+            Object.keys(data),
+          );
+          throw new Error("Server response missing generated image data");
+        }
+
+        const imageDataLength = (data.generatedImageBase64 as string).length;
+        console.log(
+          `[AI Generate] Got generated image — ${Math.round(imageDataLength / 1024)}KB`,
+        );
 
         setStatusText("Applying racing frame...");
         setProgress(80);
 
         const framedPhoto = await applyRacingFrame(
-          data.generatedImageBase64,
-          selectedTheme!.theme,
+          data.generatedImageBase64 as string,
+          theme,
+        );
+        console.log(
+          `[AI Generate] Frame applied — total time: ${((Date.now() - startTime) / 1000).toFixed(1)}s`,
         );
 
         setProgress(100);
@@ -110,7 +165,7 @@ function LoadingPage() {
           void navigate("/result");
         }, 500);
       } catch (err) {
-        console.error("AI generation failed:", err);
+        console.error("[AI Generate] Failed:", err);
         const message =
           err instanceof Error ? err.message : "Something went wrong";
         setError(message);

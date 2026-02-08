@@ -29,6 +29,23 @@ function getSQLiteDatabase(): DatabaseSync {
     CREATE INDEX IF NOT EXISTS idx_photo_results_photo_path ON photo_results(photo_path);
   `);
 
+  // Migration: add missing columns for databases created with an older schema
+  const columns = db.prepare("PRAGMA table_info(photo_results)").all() as {
+    name: string;
+  }[];
+  const columnNames = new Set(columns.map((col) => col.name));
+
+  if (!columnNames.has("quiz_result")) {
+    db.exec(
+      "ALTER TABLE photo_results ADD COLUMN quiz_result TEXT NOT NULL DEFAULT ''",
+    );
+  }
+  if (!columnNames.has("user_info")) {
+    db.exec(
+      "ALTER TABLE photo_results ADD COLUMN user_info TEXT NOT NULL DEFAULT '{}'",
+    );
+  }
+
   dbInstance = db;
   return db;
 }

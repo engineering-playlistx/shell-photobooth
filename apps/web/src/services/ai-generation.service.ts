@@ -13,6 +13,9 @@ const TEMPLATE_URLS: Record<RacingTheme, string | undefined> = {
   f1: process.env.RACING_TEMPLATE_F1_URL,
 }
 
+const DEFAULT_MODEL = 'google/nano-banana-pro'
+const REPLICATE_MODEL = process.env.REPLICATE_MODEL || DEFAULT_MODEL
+
 const THEME_PROMPTS: Record<RacingTheme, string> = {
   pitcrew:
     'Insert the face of the person from the first image onto the body of the person in the second image. Keep the pit crew outfit, background, and pose exactly the same. Make it look natural and photorealistic.',
@@ -42,27 +45,82 @@ export class AIGenerationService {
 
     const prompt = THEME_PROMPTS[params.theme]
 
-    const output = await this.replicate.run('google/nano-banana-pro', {
-      input: {
-        prompt,
-        image_input: [params.userPhotoUrl, targetImageUrl],
-        resolution: '2K',
-        output_format: 'png',
-        safety_filter_level: 'block_only_high',
-      },
-    })
+    console.log(`[AIService] Calling Replicate model: ${REPLICATE_MODEL}`)
+    console.log(`[AIService] Theme: ${params.theme}`)
+    console.log(`[AIService] User photo URL: ${params.userPhotoUrl}`)
+    console.log(`[AIService] Template URL: ${targetImageUrl}`)
 
-    const resultUrl = output as unknown as string
+    const startTime = Date.now()
+
+    const output = await this.replicate.run(
+      REPLICATE_MODEL as `${string}/${string}`,
+      {
+        input: {
+          prompt,
+          image_input: [params.userPhotoUrl, targetImageUrl],
+          resolution: '2K',
+          output_format: 'png',
+          safety_filter_level: 'block_only_high',
+        },
+      },
+    )
+
+    const elapsed = ((Date.now() - startTime) / 1000).toFixed(1)
+    console.log(`[AIService] Replicate responded in ${elapsed}s`)
+    console.log(`[AIService] Output type: ${typeof output}`)
+    console.log(
+      `[AIService] Output value:`,
+      String(JSON.stringify(output)).substring(0, 200),
+    )
+
+    const resultUrl = this.extractUrl(output)
     if (!resultUrl) {
       throw new Error(
-        'Unexpected response from Replicate nano-banana-pro model',
+        `Unexpected response format from Replicate model: ${typeof output}`,
       )
     }
 
+    console.log(`[AIService] Extracted URL: ${resultUrl.substring(0, 100)}...`)
     return resultUrl
   }
 
+  private extractUrl(output: unknown): string | null {
+    // String URL (nano-banana-pro)
+    if (typeof output === 'string') {
+      return output
+    }
+
+    // Array of URLs or FileOutput objects (nano-banana)
+    if (Array.isArray(output)) {
+      const first = output[0]
+      if (typeof first === 'string') return first
+      if (first && typeof first === 'object' && 'url' in first) {
+        return String((first as { url: () => string }).url())
+      }
+      if (first) return String(first)
+      return null
+    }
+
+    // FileOutput object with url() method
+    if (output && typeof output === 'object' && 'url' in output) {
+      return String((output as { url: () => string }).url())
+    }
+
+    // Last resort: try to convert to string
+    if (output) {
+      const str = String(output)
+      if (str.startsWith('http')) return str
+    }
+
+    return null
+  }
+
   async downloadAsBase64(imageUrl: string): Promise<string> {
+    console.log(
+      `[AIService] Downloading generated image: ${imageUrl.substring(0, 100)}...`,
+    )
+    const startTime = Date.now()
+
     const response = await fetch(imageUrl)
     if (!response.ok) {
       throw new Error(
@@ -79,6 +137,11 @@ export class AIGenerationService {
     const base64 = btoa(binary)
 
     const contentType = response.headers.get('content-type') || 'image/png'
+    const elapsed = ((Date.now() - startTime) / 1000).toFixed(1)
+    console.log(
+      `[AIService] Downloaded ${Math.round(arrayBuffer.byteLength / 1024)}KB in ${elapsed}s`,
+    )
+
     return `data:${contentType};base64,${base64}`
   }
 }
