@@ -17,7 +17,7 @@ const API_BASE_URL =
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const API_CLIENT_KEY = (import.meta as any).env?.VITE_API_CLIENT_KEY || "";
 // TODO: Move to environment variables
-const SUPABASE_BUCKET = "loccitane-photobooth";
+const SUPABASE_BUCKET = "photobooth-bucket";
 const SUPABASE_FOLDER = "public";
 
 function base64ToBlob(base64: string, contentType = "", sliceSize = 512) {

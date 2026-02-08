@@ -13,6 +13,14 @@ const TEMPLATE_URLS: Record<RacingTheme, string | undefined> = {
   f1: process.env.RACING_TEMPLATE_F1_URL,
 }
 
+const THEME_PROMPTS: Record<RacingTheme, string> = {
+  pitcrew:
+    'Insert the face of the person from the first image onto the body of the person in the second image. Keep the pit crew outfit, background, and pose exactly the same. Make it look natural and photorealistic.',
+  motogp:
+    'Insert the face of the person from the first image onto the body of the person in the second image. Keep the MotoGP racing suit, background, and pose exactly the same. Make it look natural and photorealistic.',
+  f1: 'Insert the face of the person from the first image onto the body of the person in the second image. Keep the F1 racing suit, background, and pose exactly the same. Make it look natural and photorealistic.',
+}
+
 export class AIGenerationService {
   private replicate: Replicate
 
@@ -32,16 +40,23 @@ export class AIGenerationService {
       )
     }
 
-    const output = await this.replicate.run('lucataco/face-swap:latest', {
+    const prompt = THEME_PROMPTS[params.theme]
+
+    const output = await this.replicate.run('google/nano-banana-pro', {
       input: {
-        source_image: params.userPhotoUrl,
-        target_image: targetImageUrl,
+        prompt,
+        image_input: [params.userPhotoUrl, targetImageUrl],
+        resolution: '2K',
+        output_format: 'png',
+        safety_filter_level: 'block_only_high',
       },
     })
 
     const resultUrl = output as unknown as string
     if (!resultUrl) {
-      throw new Error('Unexpected response from Replicate face-swap model')
+      throw new Error(
+        'Unexpected response from Replicate nano-banana-pro model',
+      )
     }
 
     return resultUrl

@@ -4,7 +4,7 @@
   as permissive
   for select
   to public
-using (((bucket_id = 'loccitane-photobooth'::text) AND (lower((storage.foldername(name))[1]) = 'public'::text) AND (auth.role() = 'anon'::text)));
+using (((bucket_id = 'photobooth-bucket'::text) AND (lower((storage.foldername(name))[1]) = 'public'::text) AND (auth.role() = 'anon'::text)));
 
 
 
@@ -13,7 +13,7 @@ using (((bucket_id = 'loccitane-photobooth'::text) AND (lower((storage.foldernam
   as permissive
   for insert
   to public
-with check (((bucket_id = 'loccitane-photobooth'::text) AND (lower((storage.foldername(name))[1]) = 'public'::text) AND (auth.role() = 'anon'::text)));
+with check (((bucket_id = 'photobooth-bucket'::text) AND (lower((storage.foldername(name))[1]) = 'public'::text) AND (auth.role() = 'anon'::text)));
 
 
 

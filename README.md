@@ -37,7 +37,7 @@ pnpm install
 
 ```bash
 pnpm wb exec -- supabase login
-pnpm wb exec -- supabase link # choose loccitane-photobooth
+pnpm wb exec -- supabase link # choose your supabase project
 ```
 
 ### Run
