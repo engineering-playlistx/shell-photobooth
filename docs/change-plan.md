@@ -2,7 +2,7 @@
 
 ## Context
 
-The current app is a L'Occitane-branded photobooth that captures 2 photos, runs a personality quiz (6 archetypes), composites a final image locally with archetype-specific frames + text, then saves/prints/emails the result.
+The current app is a branded photobooth that captures 2 photos, runs a personality quiz (6 archetypes), composites a final image locally with archetype-specific frames + text, then saves/prints/emails the result.
 
 We're converting it into an **AI-generated racing photobooth**: user picks a racing theme (Pitcrew / MotoGP / F1), takes 1 photo, and gets an AI face-swapped result via Replicate — all processed through the web backend.
 

@@ -2,8 +2,8 @@ import { Resend } from 'resend'
 import { renderToString } from 'react-dom/server'
 import { PhotoResultEmail } from './emails/photo-result'
 
-// TODO: Move to environment variables
-const RESEND_FROM_EMAIL = "L'Occitane <no-reply@loccitane.id>"
+const RESEND_FROM_EMAIL =
+  process.env.RESEND_FROM_EMAIL || 'Photobooth <no-reply@example.com>'
 const isProduction = process.env.NODE_ENV === 'production'
 
 export interface SendPhotoEmailData {
@@ -32,7 +32,7 @@ export class EmailService {
   async sendPhotoEmail(data: SendPhotoEmailData): Promise<void> {
     const fileName = data.photoUrl.split('/').pop() || 'photo.png'
 
-    const emailSubject = 'Your L’Occitane Provence Holiday Prediction ✨'
+    const emailSubject = 'Your Photobooth Result ✨'
 
     if (this.resend) {
       await this.resend.emails.send(

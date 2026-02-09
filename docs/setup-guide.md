@@ -298,17 +298,12 @@ Resend is used to email the final photobooth image to users. It only runs in pro
 
 ### Verify your sending domain:
 
-The current code sends from `L'Occitane <no-reply@loccitane.id>`. To use this:
+The sender email is configured via the `RESEND_FROM_EMAIL` environment variable. To set up your own domain:
 
-1. Go to **Domains** → **Add Domain** → enter `loccitane.id`
+1. Go to **Domains** → **Add Domain** → enter your domain
 2. Add the DNS records Resend provides (SPF, DKIM, DMARC)
 3. Wait for verification
-
-If you want to change the sender email, edit [apps/web/src/services/email.service.tsx](apps/web/src/services/email.service.tsx) line 6:
-
-```ts
-const RESEND_FROM_EMAIL = "Your Brand <no-reply@yourdomain.com>"
-```
+4. Set the `RESEND_FROM_EMAIL` env var to `"Your Brand <no-reply@yourdomain.com>"`
 
 > **Free tier**: 100 emails/day, 1 custom domain. Enough for development and small events.
 

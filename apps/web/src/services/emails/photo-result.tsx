@@ -18,29 +18,23 @@ export function PhotoResultEmail({ url }: PhotoResultEmailProps) {
   return (
     <Html lang="id">
       <Head>
-        <title>Your L’Occitane Provence Holiday Prediction ✨</title>
+        <title>Your Photobooth Result ✨</title>
       </Head>
       <Body style={bodyStyle}>
         <Container style={containerStyle}>
           <Section style={headerSectionStyle}>
-            <Text style={headingStyle}>
-              Your L’Occitane Provence Holiday Prediction ✨
-            </Text>
+            <Text style={headingStyle}>Your Photobooth Result ✨</Text>
           </Section>
           <Section style={contentSectionStyle}>
             <Text style={textStyle}>Hi there,</Text>
             <Text style={textStyle}>
-              Thank you for visiting our L’Occitane Holiday Photo Experience.
+              Thank you for visiting our photo booth experience!
             </Text>
             <Text style={textStyle}>
-              Inside, you’ll find your photo along with a little gift from us, a
-              glimpse into your holiday soundtrack, or a little new year
-              prediction.
+              Your personalized photo is ready. You can download it using the
+              button below.
             </Text>
-            <Text style={textStyle}>
-              We hope this small moment of glow follows you through the season.
-            </Text>
-            <Text style={textStyle}>See you again at our next experience.</Text>
+            <Text style={textStyle}>We hope you enjoyed the experience!</Text>
           </Section>
           <Section style={buttonSectionStyle}>
             <Button href={url} style={buttonStyle} target="_blank" download>
@@ -55,7 +49,7 @@ export function PhotoResultEmail({ url }: PhotoResultEmailProps) {
             <Text style={footerTextStyle}>
               Warmly,
               <br />
-              L’Occitane Indonesia
+              The Photobooth Team
             </Text>
           </Section>
         </Container>

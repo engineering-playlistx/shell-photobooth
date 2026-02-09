@@ -241,8 +241,8 @@ export default function FormPage() {
               htmlFor="consent"
               className="text-lg lg:text-2xl font-sans select-none"
             >
-              I consent to L’Occitane collecting and using my personal data so I
-              can receive and download my photo.
+              I consent to the collection and use of my personal data so I can
+              receive and download my photo.
             </label>
           </div>
 

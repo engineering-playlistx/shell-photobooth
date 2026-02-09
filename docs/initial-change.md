@@ -33,4 +33,4 @@ Provide assets (placeholder paths are set up):
 Theme previews: public/images/theme-pitcrew.png, theme-motogp.png, theme-f1.png
 Racing frames: public/images/frame-racing-pitcrew.png, frame-racing-motogp.png, frame-racing-f1.png
 Template images for face swap: hosted on Supabase/CDN (URLs go in env vars)
-Marketing page (apps/web/src/routes/index.tsx) still has L'Occitane/archetype copy — update when you're ready with racing-themed content.
+Marketing page (apps/web/src/routes/index.tsx) still has old branding copy — update when you're ready with racing-themed content.

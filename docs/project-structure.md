@@ -30,7 +30,7 @@
 
 ## Overview
 
-Shell Photobooth is a kiosk-style photobooth application built for L'Occitane. Users take photos, complete a personality quiz, fill out a contact form, and receive a personalized composite image via email and print.
+Shell Photobooth is a kiosk-style photobooth application. Users take photos, complete a personality quiz, fill out a contact form, and receive a personalized composite image via email and print.
 
 The app is **offline-first** — all photos and data are persisted locally via SQLite and the filesystem, with cloud delivery (Supabase storage + email via Resend) as an optional enhancement.
 
@@ -156,7 +156,7 @@ shell-photobooth/
 - **Final image compositing** on a **1280x1920 canvas**:
   1. Draws 2 captured photos at fixed positions
   2. Applies archetype-specific frame (`/images/frame-1.png` through `frame-6.png`)
-  3. Adds personalized text content using custom font "LOccitaneSerif":
+  3. Adds personalized text content using custom serif font:
      - Randomly selects 2 content types from archetype data
      - Content categories: color, soundtrack, gift, craving, numbers, prediction
 - Final composite saved to `PhotoboothContext.finalPhoto`
@@ -365,9 +365,9 @@ usecases/submit-photo.ts     # Business logic — orchestrates the flow
 │
 ├── 9. EmailService.sendPhotoResult()
 │      → Resend API call
-│      → From: "L'Occitane <no-reply@loccitane.id>"
+│      → From: configured via RESEND_FROM_EMAIL env var
 │      → To: user's email
-│      → Subject: "Your L'Occitane Provence Holiday Prediction"
+│      → Subject: "Your Photobooth Result"
 │      → Template: PhotoResultEmail (React Email component)
 │      → Idempotency key: "{email}-{filename}"
 │
@@ -427,7 +427,7 @@ usecases/submit-photo.ts     # Business logic — orchestrates the flow
 ### Resend (Email)
 
 - **API Key:** `process.env.RESEND_API_KEY`
-- **Sender:** `L'Occitane <no-reply@loccitane.id>`
+- **Sender:** Configured via `RESEND_FROM_EMAIL` env var (default: `Photobooth <no-reply@example.com>`)
 - **Behavior:**
   - Production: sends real emails via Resend API
   - Development: logs email content to console (no send)
@@ -458,7 +458,7 @@ The quiz produces one of **6 archetypes**, each with unique theming:
 Each archetype defines personalized content across these categories:
 - **Color** — a signature color
 - **Soundtrack** — a song recommendation
-- **Gift** — a L'Occitane product suggestion
+- **Gift** — a product suggestion
 - **Craving** — a food/drink craving
 - **Numbers** — lucky numbers
 - **Prediction** — a Provence-themed fortune
