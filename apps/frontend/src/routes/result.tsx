@@ -161,6 +161,7 @@ export default function ResultPage() {
           name: userInfo.name,
           email: userInfo.email,
           phone: userInfo.phone,
+          selectedTheme: selectedTheme?.theme,
         }),
       });
 

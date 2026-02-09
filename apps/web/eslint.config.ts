@@ -5,7 +5,7 @@ import { tanstackConfig } from '@tanstack/eslint-config'
 
 export default [
   {
-    ignores: ['prettier.config.js'],
+    ignores: ['prettier.config.js', '.output/**'],
   },
   ...tanstackConfig,
 ]

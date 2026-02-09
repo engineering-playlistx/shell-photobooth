@@ -15,12 +15,15 @@ function getSQLiteDatabase(): DatabaseSync {
 
   const db = new DatabaseSync(dbPath);
 
+  // Drop old table if schema is outdated, then recreate with correct schema
+  db.exec("DROP TABLE IF EXISTS photo_results");
+
   db.exec(`
     CREATE TABLE IF NOT EXISTS photo_results (
       id TEXT PRIMARY KEY,
       photo_path TEXT NOT NULL,
-      quiz_result TEXT NOT NULL,
-      user_info TEXT NOT NULL,
+      selected_theme TEXT NOT NULL DEFAULT '',
+      user_info TEXT NOT NULL DEFAULT '{}',
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL
     );
@@ -28,23 +31,6 @@ function getSQLiteDatabase(): DatabaseSync {
     CREATE INDEX IF NOT EXISTS idx_photo_results_created_at ON photo_results(created_at);
     CREATE INDEX IF NOT EXISTS idx_photo_results_photo_path ON photo_results(photo_path);
   `);
-
-  // Migration: add missing columns for databases created with an older schema
-  const columns = db.prepare("PRAGMA table_info(photo_results)").all() as {
-    name: string;
-  }[];
-  const columnNames = new Set(columns.map((col) => col.name));
-
-  if (!columnNames.has("quiz_result")) {
-    db.exec(
-      "ALTER TABLE photo_results ADD COLUMN quiz_result TEXT NOT NULL DEFAULT ''",
-    );
-  }
-  if (!columnNames.has("user_info")) {
-    db.exec(
-      "ALTER TABLE photo_results ADD COLUMN user_info TEXT NOT NULL DEFAULT '{}'",
-    );
-  }
 
   dbInstance = db;
   return db;
@@ -55,7 +41,7 @@ export function savePhotoResultToSQLite(document: PhotoResultDocument): void {
 
   const stmt = db.prepare(
     `INSERT OR REPLACE INTO photo_results 
-     (id, photo_path, quiz_result, user_info, created_at, updated_at)
+     (id, photo_path, selected_theme, user_info, created_at, updated_at)
      VALUES (?, ?, ?, ?, ?, ?)`,
   );
 
@@ -81,7 +67,7 @@ export function getAllPhotoResultsFromSQLite(): PhotoResultDocument[] {
     return {
       id: r.id as string,
       photoPath: r.photo_path as string,
-      selectedTheme: JSON.parse(r.quiz_result as string),
+      selectedTheme: JSON.parse(r.selected_theme as string),
       userInfo: JSON.parse(r.user_info as string),
       createdAt: r.created_at as string,
       updatedAt: r.updated_at as string,
@@ -103,7 +89,7 @@ export function getPhotoResultByIdFromSQLite(
   return {
     id: row.id as string,
     photoPath: row.photo_path as string,
-    selectedTheme: JSON.parse(row.quiz_result as string),
+    selectedTheme: JSON.parse(row.selected_theme as string),
     userInfo: JSON.parse(row.user_info as string),
     createdAt: row.created_at as string,
     updatedAt: row.updated_at as string,

@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS users (
   email TEXT NOT NULL,
   phone TEXT NOT NULL,
   photo_path TEXT,
+  selected_theme TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 

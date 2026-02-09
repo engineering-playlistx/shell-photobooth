@@ -9,6 +9,7 @@ export interface SubmitPhotoRequest {
   name: string
   email: string
   phone: string
+  selectedTheme?: string
 }
 
 export interface SubmitPhotoResult {
@@ -33,6 +34,7 @@ export class SubmitPhotoUseCase {
       email: request.email,
       phone: request.phone,
       photoPath: request.photoPath,
+      selectedTheme: request.selectedTheme,
     })
 
     const {

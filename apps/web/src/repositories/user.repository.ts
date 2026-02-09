@@ -5,6 +5,7 @@ export interface CreateUserData {
   email: string
   phone: string
   photoPath: string
+  selectedTheme?: string
 }
 
 export interface User {
@@ -13,6 +14,7 @@ export interface User {
   email: string
   phone: string
   photo_path: string
+  selected_theme: string | null
   created_at: string
 }
 
@@ -27,6 +29,7 @@ export class UserRepository {
         email: data.email,
         phone: data.phone,
         photo_path: data.photoPath,
+        selected_theme: data.selectedTheme ?? null,
       })
       .select()
       .single()
