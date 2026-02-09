@@ -4,7 +4,6 @@ import { PhotoResultEmail } from './emails/photo-result'
 
 const RESEND_FROM_EMAIL =
   process.env.RESEND_FROM_EMAIL || 'Photobooth <no-reply@example.com>'
-const isProduction = process.env.NODE_ENV === 'production'
 
 export interface SendPhotoEmailData {
   recipientEmail: string
@@ -17,13 +16,11 @@ export class EmailService {
   private fromEmail: string
 
   constructor() {
-    if (isProduction) {
-      const apiKey = process.env.RESEND_API_KEY
-      if (!apiKey) {
-        throw new Error('RESEND_API_KEY environment variable is required')
-      }
+    const apiKey = process.env.RESEND_API_KEY
+    if (apiKey) {
       this.resend = new Resend(apiKey)
     } else {
+      console.warn('RESEND_API_KEY not set — emails will be logged only')
       this.resend = null
     }
     this.fromEmail = RESEND_FROM_EMAIL
@@ -35,7 +32,7 @@ export class EmailService {
     const emailSubject = 'Your Photobooth Result ✨'
 
     if (this.resend) {
-      await this.resend.emails.send(
+      const { data: result, error } = await this.resend.emails.send(
         {
           from: this.fromEmail,
           to: data.recipientEmail,
@@ -50,8 +47,15 @@ export class EmailService {
         },
         { idempotencyKey: `${data.recipientEmail}-${fileName}` },
       )
+
+      if (error) {
+        console.error('Resend API error:', error)
+        throw new Error(`Failed to send email: ${error.message}`)
+      }
+
       console.log({
         message: 'Email sent successfully',
+        emailId: result.id,
         recipientEmail: data.recipientEmail,
         photoUrl: data.photoUrl,
       })

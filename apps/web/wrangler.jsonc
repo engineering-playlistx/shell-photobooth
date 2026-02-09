@@ -7,6 +7,8 @@
 	],
 	"main": "@tanstack/react-start/server-entry",
 	"vars": {
-		"REPLICATE_MODEL": "google/nano-banana"
+		"REPLICATE_MODEL": "google/nano-banana",
+		"RESEND_FROM_EMAIL": "Photobooth <no-reply@photobooth.playlistx.studio>",
+		"NODE_ENV": "production"
 	},
 }
