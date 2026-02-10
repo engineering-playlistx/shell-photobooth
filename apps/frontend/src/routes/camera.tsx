@@ -20,6 +20,9 @@ function CameraPage() {
   const [countdown, setCountdown] = useState<number | null>(null);
   const countdownRef = useRef<number | null>(null);
   const capturedPhotosRef = useRef<HTMLImageElement[]>([]);
+  const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
+  const [selectedDeviceId, setSelectedDeviceId] = useState<string | null>(null);
+  const [showCameraMenu, setShowCameraMenu] = useState(false);
 
   const canvasWidth = 1080;
   const canvasHeight = 1920;
@@ -28,8 +31,23 @@ function CameraPage() {
   const videoWidth = videoHeight / videoAspectRatio;
   const verticalOffset = VIDEO_VERTICAL_OFFSET;
 
+  async function enumerateDevices() {
+    try {
+      const allDevices = await navigator.mediaDevices.enumerateDevices();
+      const videoDevices = allDevices.filter((d) => d.kind === "videoinput");
+      setDevices(videoDevices);
+      return videoDevices;
+    } catch {
+      return [];
+    }
+  }
+
   useEffect(() => {
-    void handleStartCamera();
+    async function init() {
+      await handleStartCamera();
+      await enumerateDevices();
+    }
+    void init();
 
     return () => {
       if (animationFrameRef.current) {
@@ -152,7 +170,7 @@ function CameraPage() {
     };
   }, [isCameraActive, verticalOffset, capturedPhotos]);
 
-  async function handleStartCamera() {
+  async function handleStartCamera(deviceId?: string) {
     try {
       setError(null);
 
@@ -176,11 +194,16 @@ function CameraPage() {
         throw new Error("Camera access is not supported in this browser");
       }
 
+      const videoConstraints: MediaTrackConstraints = {
+        width: { ideal: 1920 },
+        height: { ideal: 1080 },
+      };
+      if (deviceId) {
+        videoConstraints.deviceId = { exact: deviceId };
+      }
+
       const mediaStream = await window.navigator.mediaDevices.getUserMedia({
-        video: {
-          width: { ideal: 1920 },
-          height: { ideal: 1080 },
-        },
+        video: videoConstraints,
         audio: false,
       });
 
@@ -294,6 +317,15 @@ function CameraPage() {
     return () => clearTimeout(timer);
   }, [countdown]);
 
+  function handleSelectCamera(deviceId: string) {
+    setSelectedDeviceId(deviceId);
+    setShowCameraMenu(false);
+    capturedPhotosRef.current = [];
+    setCapturedPhotos([]);
+    setRetakeCount(0);
+    void handleStartCamera(deviceId);
+  }
+
   function handleRetake() {
     if (
       capturedPhotosRef.current.length === 0 ||
@@ -307,7 +339,7 @@ function CameraPage() {
     setCapturedPhotos([]);
 
     if (!isCameraActive && streamRef.current === null) {
-      void handleStartCamera();
+      void handleStartCamera(selectedDeviceId ?? undefined);
     }
   }
 
@@ -361,6 +393,76 @@ function CameraPage() {
         </div>
         Back
       </button>
+
+      {/* Camera selector button - top right */}
+      {devices.length > 1 && (
+        <div className="absolute opacity-50 top-22 right-32 z-30">
+          <button
+            onClick={() => setShowCameraMenu((prev) => !prev)}
+            className="p-3 rounded-full transition-all duration-200 active:scale-95"
+            aria-label="Select camera"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="28"
+              height="28"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="text-white"
+            >
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+              <circle cx="12" cy="13" r="4" />
+            </svg>
+          </button>
+
+          {showCameraMenu && (
+            <>
+              <div
+                className="fixed inset-0"
+                onClick={() => setShowCameraMenu(false)}
+              />
+              <div className="absolute top-16 right-0 bg-white rounded-2xl shadow-xl overflow-hidden min-w-72 z-10">
+                {devices.map((device, index) => (
+                  <button
+                    key={device.deviceId}
+                    onClick={() => handleSelectCamera(device.deviceId)}
+                    className={`w-full text-left px-6 py-4 text-lg transition-colors duration-150 flex items-center gap-3 ${
+                      selectedDeviceId === device.deviceId
+                        ? "bg-primary font-bold text-secondary"
+                        : "hover:bg-gray-100 text-secondary"
+                    }`}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill={
+                        selectedDeviceId === device.deviceId
+                          ? "currentColor"
+                          : "none"
+                      }
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="shrink-0"
+                    >
+                      <circle cx="12" cy="12" r="10" />
+                    </svg>
+                    {device.label || `Camera ${index + 1}`}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+      )}
+
       {error && (
         <div className="absolute top-32 left-1/2 -translate-x-1/2 z-20 p-3 bg-red-500/20 border border-red-500 rounded-lg">
           <p className="text-red-400">{error}</p>
