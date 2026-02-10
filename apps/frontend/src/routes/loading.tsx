@@ -183,15 +183,20 @@ function LoadingPage() {
   };
 
   return (
-    <div className="h-svh aspect-9/16 mx-auto relative flex items-center justify-center p-4 bg-black overflow-hidden">
-      <video
+    <div
+      className="h-svh aspect-9/16 mx-auto bg-cover bg-center bg-no-repeat flex items-start justify-center p-4 bg-primary text-secondary overflow-hidden"
+      style={{
+        backgroundImage: `url('${getAssetPath("/images/bg_loading.png")}')`,
+      }}
+    >
+      {/* <video
         autoPlay
         loop
         playsInline
         className="absolute inset-0 w-full h-full object-cover"
       >
         <source src={getAssetPath("/videos/kv2.mp4")} type="video/mp4" />
-      </video>
+      </video> */}
 
       {error ? (
         <div className="relative z-10 flex flex-col items-center gap-8 px-12">
@@ -214,7 +219,7 @@ function LoadingPage() {
           </div>
         </div>
       ) : (
-        <div className="absolute bottom-40 left-1/2 transform -translate-x-1/2 w-5/6 px-8 z-10">
+        <div className="absolute bottom-80 left-1/2 transform -translate-x-1/2 w-5/6 px-8 z-10">
           <div className="relative w-full h-20 rounded-xl bg-secondary overflow-hidden shadow-lg">
             <div
               className="absolute top-0 left-0 h-full bg-primary transition-all duration-300 ease-linear rounded-lg"

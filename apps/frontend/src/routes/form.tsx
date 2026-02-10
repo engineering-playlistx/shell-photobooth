@@ -128,7 +128,7 @@ export default function FormPage() {
     <div
       className="h-svh aspect-9/16 mx-auto bg-cover bg-center bg-no-repeat flex items-start justify-center p-4 bg-primary text-secondary"
       style={{
-        backgroundImage: `url('${getAssetPath("/images/bg-app.png")}')`,
+        backgroundImage: `url('${getAssetPath("/images/bg_form.png")}')`,
       }}
     >
       <button

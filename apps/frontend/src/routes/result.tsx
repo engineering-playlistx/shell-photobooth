@@ -283,12 +283,13 @@ export default function ResultPage() {
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{
-          backgroundImage: `url('${getAssetPath("/images/result.png")}')`,
+          backgroundImage: `url('${getAssetPath("/images/bg_result.png")}')`,
         }}
       />
-      <div className="relative z-10 w-full px-36 lg:px-40 mx-auto">
-        <div className="flex flex-col items-center gap-12">
-          <div className="w-full h-[70vh] pt-48 lg:pt-36">
+      <div className="relative z-10 w-full px-36 mx-auto mb-20">
+        <div className="flex flex-col items-center gap-8">
+          <h1 className="text-4xl">Ready to Race!</h1>
+          <div className="w-full h-[1200px] py-4">
             {!!finalPhoto && !!selectedTheme && (
               <img
                 src={finalPhoto}

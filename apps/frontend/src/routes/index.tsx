@@ -19,7 +19,7 @@ function IndexPage() {
       <div
         className="absolute inset-0 w-full h-full px-26 pb-20 pt-76"
         style={{
-          background: `url('${getAssetPath("/images/home-image.png")}')`,
+          background: `url('${getAssetPath("/images/bg_index.png")}')`,
           backgroundSize: "cover",
         }}
       >
@@ -27,7 +27,7 @@ function IndexPage() {
           <source src={getAssetPath("/videos/kv1.mp4")} type="video/mp4" />
         </video> */}
       </div>
-      <div className="w-full text-center absolute bottom-48 left-1/2 -translate-x-1/2 z-10">
+      <div className="w-full text-center absolute bottom-100 left-1/2 -translate-x-1/2 z-10">
         <div className="flex flex-col items-center gap-4">
           <button
             onClick={handleOpenCamera}

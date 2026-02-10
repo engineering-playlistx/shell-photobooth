@@ -24,7 +24,7 @@ function SelectPage() {
       <div
         className="absolute inset-0 w-full h-full"
         style={{
-          background: `url('${getAssetPath("/images/bg-app.png")}')`,
+          background: `url('${getAssetPath("/images/bg_select.png")}')`,
           backgroundSize: "cover",
         }}
       />
