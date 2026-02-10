@@ -286,9 +286,9 @@ export default function ResultPage() {
           backgroundImage: `url('${getAssetPath("/images/bg_result.png")}')`,
         }}
       />
-      <div className="relative z-10 w-full px-36 mx-auto mb-20">
+      <div className="relative z-10 w-full px-36 mx-auto mb-40">
         <div className="flex flex-col items-center gap-8">
-          <h1 className="text-4xl">Ready to Race!</h1>
+          <h1 className="text-8xl font-black text-tertiary">Ready to Race!</h1>
           <div className="w-full h-[1200px] py-4">
             {!!finalPhoto && !!selectedTheme && (
               <img
@@ -303,14 +303,14 @@ export default function ResultPage() {
           <div className="text-center grid grid-cols-2 gap-8 w-full">
             <button
               type="button"
-              className="px-7 py-5 bg-transparent hover:bg-tertiary text-secondary border border-secondary rounded-lg font-medium text-3xl lg:text-5xl transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed select-none font-sans"
+              className="px-7 py-5 bg-white text-secondary rounded-lg font-medium text-5xl transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed select-none"
               onClick={() => void navigate("/")}
             >
               Back to Home
             </button>
             <button
               type="button"
-              className="px-7 py-5 bg-secondary hover:bg-tertiary text-white rounded-lg font-medium text-3xl lg:text-5xl transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed select-none font-sans"
+              className="px-7 py-5 bg-tertiary text-white rounded-lg font-medium text-5xl transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed select-none"
               onClick={() => void emailResult()}
               disabled={isSubmitting}
             >
@@ -319,7 +319,7 @@ export default function ResultPage() {
             {process.env.NODE_ENV === "development" && (
               <button
                 type="button"
-                className="px-7 py-5 bg-transparent hover:bg-tertiary text-secondary border border-secondary rounded-lg font-medium text-3xl lg:text-5xl transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed select-none font-sans"
+                className="px-7 py-5 bg-white text-secondary rounded-lg font-medium text-5xl transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed select-none"
                 onClick={downloadPhoto}
               >
                 Download
@@ -328,7 +328,7 @@ export default function ResultPage() {
             {process.env.NODE_ENV === "development" && (
               <button
                 type="button"
-                className="px-7 py-5 bg-transparent hover:bg-tertiary text-secondary border border-secondary rounded-lg font-medium text-3xl lg:text-5xl transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed select-none font-sans"
+                className="px-7 py-5 bg-white text-secondary rounded-lg font-medium text-5xl transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed select-none"
                 onClick={() => void handlePrintButtonClicked()}
               >
                 Print

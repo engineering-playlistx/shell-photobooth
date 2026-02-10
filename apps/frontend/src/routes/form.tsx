@@ -156,17 +156,19 @@ export default function FormPage() {
         </div>
         Back
       </button>
-      <div className="w-full px-32 lg:px-40 mx-auto mt-92">
-        <div className="mb-4 text-center">
-          <h1 className="text-7xl text-balance mb-2">Fill your data</h1>
+      <div className="w-full px-32 lg:px-40 mx-auto mt-52">
+        <div className="mb-20 text-center">
+          <h1 className="text-[56px] leading-tight mb-2 font-black">
+            Complete your details before printing your photo
+          </h1>
         </div>
 
         <form
-          className="flex flex-col gap-2 mb-8 text-2xl"
+          className="flex flex-col gap-2 mb-8 text-2xl text-black"
           onSubmit={handleSubmit}
         >
           <div className="flex flex-col gap-5">
-            <label className="font-sans mb-0 mt-2" htmlFor="name">
+            <label className="font-medium mb-0 mt-2" htmlFor="name">
               Name
             </label>
             <input
@@ -177,8 +179,8 @@ export default function FormPage() {
               onChange={(e) => setName(e.target.value)}
               onFocus={handleInputFocus}
               onBlur={handleInputBlur}
-              placeholder="Your name here"
-              className="w-full px-4 py-3 text-3xl lg:text-4xl font-serif bg-milk-white rounded-lg border border-secondary/40 focus:outline-none focus:border-tertiary transition-all"
+              placeholder="e.g. Alonso"
+              className="w-full px-6 py-6 text-3xl lg:text-4xl font-medium bg-white rounded-xl border border-secondary/40 focus:outline-none focus:border-tertiary transition-all"
               autoComplete="off"
               required
               autoFocus
@@ -186,7 +188,7 @@ export default function FormPage() {
           </div>
 
           <div className="flex flex-col gap-5">
-            <label className="font-sans mb-0 mt-2" htmlFor="email">
+            <label className="font-medium mb-0 mt-2" htmlFor="email">
               E-mail Address
             </label>
             <input
@@ -198,8 +200,8 @@ export default function FormPage() {
               onChange={(e) => setEmail(e.target.value)}
               onFocus={handleInputFocus}
               onBlur={handleInputBlur}
-              placeholder="name@email.com"
-              className="w-full px-4 py-3 text-3xl lg:text-4xl font-serif bg-milk-white rounded-lg border border-secondary/40 focus:outline-none focus:border-tertiary transition-all"
+              placeholder="e.g. yourname@shell.com"
+              className="w-full px-6 py-6 text-3xl lg:text-4xl font-medium bg-white rounded-xl border border-secondary/40 focus:outline-none focus:border-tertiary transition-all"
               autoComplete="off"
               pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}"
               required
@@ -207,7 +209,7 @@ export default function FormPage() {
           </div>
 
           <div className="flex flex-col gap-5">
-            <label className="font-sans mb-0 mt-2" htmlFor="phone">
+            <label className="font-medium mb-0 mt-2" htmlFor="phone">
               Phone Number
             </label>
             <input
@@ -218,8 +220,8 @@ export default function FormPage() {
               onChange={(e) => setPhone(e.target.value)}
               onFocus={handleInputFocus}
               onBlur={handleInputBlur}
-              placeholder="Your phone number"
-              className="w-full px-4 py-3 text-3xl lg:text-4xl font-serif bg-milk-white rounded-lg border border-secondary/40 focus:outline-none focus:border-tertiary transition-all"
+              placeholder="e.g. 0812-6738-1902"
+              className="w-full px-6 py-6 text-3xl lg:text-4xl font-medium bg-white rounded-xl border border-secondary/40 focus:outline-none focus:border-tertiary transition-all"
               autoComplete="off"
               pattern="(\+62|62|0)[0-9\-]{9,15}"
               title="Please enter a valid phone number, example: 0812-3456-7890 or +6281234567890"
@@ -249,9 +251,9 @@ export default function FormPage() {
           <div className="flex justify-center mt-8">
             <button
               type="submit"
-              className="px-10 py-5 bg-secondary hover:bg-tertiary text-white rounded-lg font-medium text-3xl lg:text-5xl transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed select-none font-sans"
+              className="px-14 py-6 bg-tertiary hover:bg-tertiary text-white rounded-xl font-medium text-3xl lg:text-5xl transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed select-none"
             >
-              Get Result
+              Confirm
             </button>
           </div>
         </form>

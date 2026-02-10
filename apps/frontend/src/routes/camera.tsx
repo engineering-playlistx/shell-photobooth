@@ -101,7 +101,7 @@ function CameraPage() {
       }
 
       if (countdownRef.current !== null && countdownRef.current > 0) {
-        const countdownX = 280;
+        const countdownX = 840;
         const countdownY = verticalOffset + videoHeight - 48;
 
         context.save();
@@ -125,13 +125,13 @@ function CameraPage() {
           2 * Math.PI,
           false,
         );
-        context.fillStyle = "#F2E9DABF";
+        context.fillStyle = "#DD1D21";
         context.fill();
         context.lineWidth = 4;
-        context.strokeStyle = "#9C774D";
+        context.strokeStyle = "#DD1D21";
         context.stroke();
 
-        context.fillStyle = "#9C774D";
+        context.fillStyle = "#FFF";
         context.font = "bold 52px sans-serif";
         context.textAlign = "center";
         context.textBaseline = "middle";

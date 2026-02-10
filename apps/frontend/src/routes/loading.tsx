@@ -220,15 +220,13 @@ function LoadingPage() {
         </div>
       ) : (
         <div className="absolute bottom-80 left-1/2 transform -translate-x-1/2 w-5/6 px-8 z-10">
-          <div className="relative w-full h-20 rounded-xl bg-secondary overflow-hidden shadow-lg">
+          <div className="relative w-full h-20 rounded-xl bg-[#6F0000] overflow-hidden shadow-lg border border-white border-2">
             <div
-              className="absolute top-0 left-0 h-full bg-primary transition-all duration-300 ease-linear rounded-lg"
+              className="absolute top-0 left-0 h-full bg-tertiary transition-all duration-300 ease-linear rounded-lg"
               style={{ width: `${progress}%` }}
             />
             <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-white font-sans font-medium text-3xl">
-                {statusText}
-              </span>
+              <span className="text-white text-3xl">{statusText}</span>
             </div>
           </div>
         </div>

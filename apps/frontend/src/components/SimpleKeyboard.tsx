@@ -91,7 +91,7 @@ export default function SimpleKeyboard({
       `}</style>
       <div
         ref={containerRef}
-        className="fixed bottom-80 left-0 right-0 z-50 bg-white/50 shadow-2xl p-4 px-20"
+        className="fixed bottom-52 left-0 right-0 z-50 bg-white/50 shadow-2xl p-4 px-20"
         onMouseDown={(e) => {
           // Prevent the input from losing focus when clicking on the keyboard
           e.preventDefault();
