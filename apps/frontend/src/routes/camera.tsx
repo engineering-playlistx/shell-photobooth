@@ -12,7 +12,6 @@ function CameraPage() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
-  const frameImageRef = useRef<HTMLImageElement | null>(null);
   const animationFrameRef = useRef<number | null>(null);
   const [isCameraActive, setIsCameraActive] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -43,17 +42,6 @@ function CameraPage() {
         streamRef.current = null;
       }
     };
-  }, []);
-
-  useEffect(() => {
-    if (frameImageRef.current) {
-      return;
-    }
-
-    const frameImage = new window.Image();
-    frameImage.crossOrigin = "anonymous";
-    frameImage.src = getAssetPath("/images/frame.png");
-    frameImageRef.current = frameImage;
   }, []);
 
   useEffect(() => {
@@ -110,16 +98,6 @@ function CameraPage() {
             videoHeight,
           );
         }
-      }
-
-      if (frameImageRef.current && frameImageRef.current.complete) {
-        context.drawImage(
-          frameImageRef.current,
-          0,
-          0,
-          canvas.width,
-          canvas.height,
-        );
       }
 
       if (countdownRef.current !== null && countdownRef.current > 0) {
@@ -352,212 +330,121 @@ function CameraPage() {
   }
 
   return (
-    <div className="h-svh aspect-9/16 mx-auto bg-primary text-secondary relative">
+    <div
+      className="h-svh aspect-9/16 mx-auto bg-cover bg-center bg-no-repeat text-secondary relative overflow-hidden"
+      style={{
+        backgroundImage: `url('${getAssetPath("/images/bg_camera.png")}')`,
+      }}
+    >
       <button
         onClick={() => {
           void navigate("/");
         }}
-        className="absolute top-22 left-32 z-20 transition-all duration-200 active:scale-95 flex flex-col align-left items-start  gap-2 text-secondary text-2xl"
+        className="absolute top-22 left-32 z-20 transition-all duration-200 active:scale-95 flex flex-row align-left items-center  gap-4 text-secondary text-2xl"
         aria-label="Back to home"
       >
-        <div className="p-5 bg-secondary/80 hover:bg-secondary rounded-full shadow-lg transition-all duration-200 active:scale-95 flex flex-row">
+        <div className="p-3 bg-secondary rounded-full shadow-lg transition-all duration-200 active:scale-95 flex flex-row">
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            width="32"
-            height="32"
+            width="28"
+            height="28"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
-            className="text-primary"
+            className="text-white"
           >
             <path d="M19 12H5M12 19l-7-7 7-7" />
           </svg>
         </div>
-        Homepage
+        Back
       </button>
-      <div className="w-full mx-auto">
-        {error && (
-          <div className="mb-4 p-3 bg-red-500/20 border border-red-500 rounded-lg">
-            <p className="text-red-400">{error}</p>
-          </div>
-        )}
+      {error && (
+        <div className="absolute top-32 left-1/2 -translate-x-1/2 z-20 p-3 bg-red-500/20 border border-red-500 rounded-lg">
+          <p className="text-red-400">{error}</p>
+        </div>
+      )}
 
-        <div className="bg-yellow-400/10 backdrop-blur-lg border border-yellow-400/20 rounded-2xl shadow-2xl">
-          <div className="space-y-4">
-            <div className="relative aspect-9/16 bg-secondary rounded-lg overflow-hidden">
-              <canvas
-                ref={canvasRef}
-                width={canvasWidth}
-                height={canvasHeight}
-                className="w-full h-full object-contain bg-secondary"
-              />
-              <video
-                ref={videoRef}
-                autoPlay
-                playsInline
-                muted
-                className="hidden"
-              />
-              <div className="z-10 absolute top-9/12 left-1/2 -translate-x-1/2 -translate-y-1/2 cursor-pointer flex items-center justify-center gap-8 lg:gap-16 w-full">
-                <button
-                  onClick={handleRetake}
-                  className="flex flex-col items-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed select-none"
-                  aria-label="Retake photo"
-                  disabled={
-                    capturedPhotos.length <= 0 ||
-                    retakeCount >= MAX_RETAKE_COUNT
-                  }
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      handleRetake();
-                    }
-                  }}
-                >
-                  <img
-                    src={getAssetPath("/images/retake.png")}
-                    alt="Retake"
-                    className="size-24 lg:size-36 object-contain"
-                    style={{
-                      filter:
-                        "brightness(0) saturate(100%) invert(18%) sepia(13%) saturate(1234%) hue-rotate(314deg) brightness(95%) contrast(90%)",
-                    }}
-                    onMouseDown={(e) => {
-                      e.currentTarget.style.filter =
-                        "brightness(0) saturate(100%) invert(48%) sepia(23%) saturate(738%) hue-rotate(358deg) brightness(92%) contrast(87%)";
-                    }}
-                    onMouseUp={(e) => {
-                      e.currentTarget.style.filter =
-                        "brightness(0) saturate(100%) invert(18%) sepia(13%) saturate(1234%) hue-rotate(314deg) brightness(95%) contrast(90%)";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.filter =
-                        "brightness(0) saturate(100%) invert(18%) sepia(13%) saturate(1234%) hue-rotate(314deg) brightness(95%) contrast(90%)";
-                    }}
-                    onTouchStart={(e) => {
-                      e.currentTarget.style.filter =
-                        "brightness(0) saturate(100%) invert(48%) sepia(23%) saturate(738%) hue-rotate(358deg) brightness(92%) contrast(87%)";
-                    }}
-                    onTouchEnd={(e) => {
-                      e.currentTarget.style.filter =
-                        "brightness(0) saturate(100%) invert(18%) sepia(13%) saturate(1234%) hue-rotate(314deg) brightness(95%) contrast(90%)";
-                    }}
-                    onTouchCancel={(e) => {
-                      e.currentTarget.style.filter =
-                        "brightness(0) saturate(100%) invert(18%) sepia(13%) saturate(1234%) hue-rotate(314deg) brightness(95%) contrast(90%)";
-                    }}
-                  />
-                  <span className="text-secondary font-medium text-2xl lg:text-3xl absolute -bottom-4 font-sans">
-                    Retake
-                  </span>
-                </button>
-                <button
-                  onClick={handleCapturePhoto}
-                  className="size-24 lg:size-48 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed select-none"
-                  disabled={
-                    capturedPhotos.length >= 1 ||
-                    !isCameraActive ||
-                    countdown !== null
-                  }
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      handleCapturePhoto();
-                    }
-                  }}
-                >
-                  <img
-                    src={getAssetPath("/images/capture.png")}
-                    alt="Capture"
-                    className="transition-all duration-200 active:brightness-[1.3] active:hue-rotate-15"
-                    style={{
-                      filter:
-                        "brightness(0) saturate(100%) invert(18%) sepia(13%) saturate(1234%) hue-rotate(314deg) brightness(95%) contrast(90%)",
-                    }}
-                    onMouseDown={(e) => {
-                      e.currentTarget.style.filter =
-                        "brightness(0) saturate(100%) invert(48%) sepia(23%) saturate(738%) hue-rotate(358deg) brightness(92%) contrast(87%)";
-                    }}
-                    onMouseUp={(e) => {
-                      e.currentTarget.style.filter =
-                        "brightness(0) saturate(100%) invert(18%) sepia(13%) saturate(1234%) hue-rotate(314deg) brightness(95%) contrast(90%)";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.filter =
-                        "brightness(0) saturate(100%) invert(18%) sepia(13%) saturate(1234%) hue-rotate(314deg) brightness(95%) contrast(90%)";
-                    }}
-                    onTouchStart={(e) => {
-                      e.currentTarget.style.filter =
-                        "brightness(0) saturate(100%) invert(48%) sepia(23%) saturate(738%) hue-rotate(358deg) brightness(92%) contrast(87%)";
-                    }}
-                    onTouchEnd={(e) => {
-                      e.currentTarget.style.filter =
-                        "brightness(0) saturate(100%) invert(18%) sepia(13%) saturate(1234%) hue-rotate(314deg) brightness(95%) contrast(90%)";
-                    }}
-                    onTouchCancel={(e) => {
-                      e.currentTarget.style.filter =
-                        "brightness(0) saturate(100%) invert(18%) sepia(13%) saturate(1234%) hue-rotate(314deg) brightness(95%) contrast(90%)";
-                    }}
-                  />
-                  <span className="text-secondary font-medium text-2xl font-sans">
-                    Tap to capture
-                  </span>
-                </button>
-                <button
-                  onClick={handleNext}
-                  className="flex flex-col items-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed select-none"
-                  aria-label="Next"
-                  disabled={capturedPhotos.length < 1}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      handleNext();
-                    }
-                  }}
-                >
-                  <img
-                    src={getAssetPath("/images/next.png")}
-                    alt="Next"
-                    className="size-24 lg:size-36 object-contain"
-                    style={{
-                      filter:
-                        "brightness(0) saturate(100%) invert(18%) sepia(13%) saturate(1234%) hue-rotate(314deg) brightness(95%) contrast(90%)",
-                    }}
-                    onMouseDown={(e) => {
-                      e.currentTarget.style.filter =
-                        "brightness(0) saturate(100%) invert(48%) sepia(23%) saturate(738%) hue-rotate(358deg) brightness(92%) contrast(87%)";
-                    }}
-                    onMouseUp={(e) => {
-                      e.currentTarget.style.filter =
-                        "brightness(0) saturate(100%) invert(18%) sepia(13%) saturate(1234%) hue-rotate(314deg) brightness(95%) contrast(90%)";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.filter =
-                        "brightness(0) saturate(100%) invert(18%) sepia(13%) saturate(1234%) hue-rotate(314deg) brightness(95%) contrast(90%)";
-                    }}
-                    onTouchStart={(e) => {
-                      e.currentTarget.style.filter =
-                        "brightness(0) saturate(100%) invert(48%) sepia(23%) saturate(738%) hue-rotate(358deg) brightness(92%) contrast(87%)";
-                    }}
-                    onTouchEnd={(e) => {
-                      e.currentTarget.style.filter =
-                        "brightness(0) saturate(100%) invert(18%) sepia(13%) saturate(1234%) hue-rotate(314deg) brightness(95%) contrast(90%)";
-                    }}
-                    onTouchCancel={(e) => {
-                      e.currentTarget.style.filter =
-                        "brightness(0) saturate(100%) invert(18%) sepia(13%) saturate(1234%) hue-rotate(314deg) brightness(95%) contrast(90%)";
-                    }}
-                  />
-                  <span className="text-secondary font-medium text-2xl lg:text-3xl absolute -bottom-4 font-sans">
-                    Next
-                  </span>
-                </button>
-              </div>
-            </div>
-          </div>
+      <div className="relative w-full h-full overflow-hidden">
+        <canvas
+          ref={canvasRef}
+          width={canvasWidth}
+          height={canvasHeight}
+          className="w-full h-full object-contain"
+        />
+        <video ref={videoRef} autoPlay playsInline muted className="hidden" />
+
+        <div className="z-10 absolute bottom-100 left-1/2 -translate-x-1/2 -translate-y-1/2 cursor-pointer flex items-center justify-center gap-8 lg:gap-16 w-full">
+          <button
+            onClick={handleRetake}
+            className="flex flex-col items-center gap-2 cursor-pointer disabled:opacity-100 disabled:cursor-not-allowed select-none"
+            aria-label="Retake photo"
+            disabled={
+              capturedPhotos.length <= 0 || retakeCount >= MAX_RETAKE_COUNT
+            }
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                handleRetake();
+              }
+            }}
+          >
+            <img
+              src={getAssetPath("/images/ico-retake.png")}
+              alt="Retake"
+              className="size-32 object-contain"
+            />
+            <span className="text-white font-medium text-2xl lg:text-3xl absolute -bottom-4 font-sans">
+              Retake
+            </span>
+          </button>
+          <button
+            onClick={handleCapturePhoto}
+            className="size-48 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed select-none"
+            disabled={
+              capturedPhotos.length >= 1 ||
+              !isCameraActive ||
+              countdown !== null
+            }
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                handleCapturePhoto();
+              }
+            }}
+          >
+            <img
+              src={getAssetPath("/images/ico-capture.png")}
+              alt="Capture"
+              className="transition-all duration-200 active:brightness-[1.3] active:hue-rotate-15"
+            />
+            {/* <span className="text-secondary font-medium text-2xl font-sans">
+              Tap to capture
+            </span> */}
+          </button>
+          <button
+            onClick={handleNext}
+            className="flex flex-col items-center gap-2 cursor-pointer disabled:opacity-100 disabled:cursor-not-allowed select-none"
+            aria-label="Next"
+            disabled={capturedPhotos.length < 1}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                handleNext();
+              }
+            }}
+          >
+            <img
+              src={getAssetPath("/images/ico-next.png")}
+              alt="Next"
+              className="size-32 object-contain"
+            />
+            <span className="text-white font-medium text-2xl lg:text-3xl absolute -bottom-4 font-sans">
+              Next
+            </span>
+          </button>
         </div>
       </div>
     </div>

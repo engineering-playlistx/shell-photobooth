@@ -32,26 +32,26 @@ function SelectPage() {
         onClick={() => {
           void navigate("/");
         }}
-        className="absolute top-22 left-32 z-20 transition-all duration-200 active:scale-95 flex flex-col align-left items-start gap-2 text-secondary text-2xl"
+        className="absolute top-22 left-32 z-20 transition-all duration-200 active:scale-95 flex flex-row align-left items-center  gap-4 text-secondary text-2xl"
         aria-label="Back to home"
       >
-        <div className="p-5 bg-secondary/80 hover:bg-secondary rounded-full shadow-lg transition-all duration-200 active:scale-95 flex flex-row">
+        <div className="p-3 bg-secondary rounded-full shadow-lg transition-all duration-200 active:scale-95 flex flex-row">
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            width="32"
-            height="32"
+            width="28"
+            height="28"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
-            className="text-primary"
+            className="text-white"
           >
             <path d="M19 12H5M12 19l-7-7 7-7" />
           </svg>
         </div>
-        Homepage
+        Back
       </button>
       <div className="relative z-10 w-full px-24 flex flex-col items-center gap-12">
         <h1 className="text-5xl lg:text-6xl font-bold font-sans text-center">

@@ -1,9 +1,9 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #ffc700;
-  --color-secondary: #3f2b2e;
-  --color-tertiary: #9c774d;
+  --color-primary: #ffc600;
+  --color-secondary: #4a4a4a;
+  --color-tertiary: #dd1d21;
   --color-milk-white: #f2e9da;
   --font-family-sans:
     system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial,

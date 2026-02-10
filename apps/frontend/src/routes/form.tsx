@@ -135,26 +135,26 @@ export default function FormPage() {
         onClick={() => {
           void navigate("/");
         }}
-        className="absolute top-22 left-32 z-20 transition-all duration-200 active:scale-95 flex flex-col align-left items-start  gap-2 text-secondary text-2xl"
+        className="absolute top-22 left-32 z-20 transition-all duration-200 active:scale-95 flex flex-row align-left items-center  gap-4 text-secondary text-2xl"
         aria-label="Back to home"
       >
-        <div className="p-5 bg-secondary/80 hover:bg-secondary rounded-full shadow-lg transition-all duration-200 active:scale-95 flex flex-row">
+        <div className="p-3 bg-secondary rounded-full shadow-lg transition-all duration-200 active:scale-95 flex flex-row">
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            width="32"
-            height="32"
+            width="28"
+            height="28"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
-            className="text-primary"
+            className="text-white"
           >
             <path d="M19 12H5M12 19l-7-7 7-7" />
           </svg>
         </div>
-        Homepage
+        Back
       </button>
       <div className="w-full px-32 lg:px-40 mx-auto mt-92">
         <div className="mb-4 text-center">
