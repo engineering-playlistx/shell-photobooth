@@ -27,13 +27,13 @@ function IndexPage() {
           <source src={getAssetPath("/videos/kv1.mp4")} type="video/mp4" />
         </video> */}
       </div>
-      <div className="w-full text-center absolute bottom-100 left-1/2 -translate-x-1/2 z-10">
+      <div className="w-full text-center absolute bottom-85 left-1/2 -translate-x-1/2 z-10">
         <div className="flex flex-col items-center gap-4">
           <button
             onClick={handleOpenCamera}
-            className="px-10 py-5 bg-white hover:bg-tertiary text-secondary rounded-lg font-medium text-3xl lg:text-5xl transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed select-none font-sans active:bg-secondary active:text-white shadow-xl"
+            className="px-12 py-8 bg-tertiary hover:bg-tertiary text-white rounded-xl font-shell font-black text-3xl lg:text-5xl transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed select-none active:bg-secondary active:text-white shadow-xl"
           >
-            Tap to enter
+            Tap to Start
           </button>
         </div>
       </div>

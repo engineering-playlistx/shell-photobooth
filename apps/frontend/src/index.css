@@ -1,18 +1,87 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: "Shell";
+  src: url("/fonts/ShellBook.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Shell";
+  src: url("/fonts/ShellMedium.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Shell";
+  src: url("/fonts/ShellBookItalic.ttf") format("truetype");
+  font-weight: 400;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Shell";
+  src: url("/fonts/ShellBold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Shell";
+  src: url("/fonts/ShellHeavy.ttf") format("truetype");
+  font-weight: 900;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Shell CHT";
+  src: url("/fonts/ShellCHT-Medium.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Shell CHT";
+  src: url("/fonts/ShellCHT-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Shell Condensed";
+  src: url("/fonts/ShellCondensedLight.ttf") format("truetype");
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Shell Condensed";
+  src: url("/fonts/ShellCondensedMedium.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Shell Condensed";
+  src: url("/fonts/ShellCondensedBold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+}
+
 @theme {
   --color-primary: #ffc600;
   --color-secondary: #4a4a4a;
   --color-tertiary: #dd1d21;
   --color-milk-white: #f2e9da;
-  --font-family-sans:
-    system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial,
-    sans-serif;
-  --font-family-serif: Georgia, "Times New Roman", Times, serif;
+  --font-shell: "Shell", sans-serif;
+  --font-shell-cht: "Shell CHT", sans-serif;
+  --font-shell-condensed: "Shell Condensed", sans-serif;
 }
 
 body {
-  font-family: var(--font-family-serif), serif;
+  font-family: var(--font-shell);
 }
 
 @keyframes slide-up {

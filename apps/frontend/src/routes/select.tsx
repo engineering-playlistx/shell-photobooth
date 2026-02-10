@@ -32,58 +32,55 @@ function SelectPage() {
         onClick={() => {
           void navigate("/");
         }}
-        className="absolute top-22 left-32 z-20 transition-all duration-200 active:scale-95 flex flex-row align-left items-center  gap-4 text-secondary text-2xl"
+        className="absolute top-22 left-32 z-20 transition-all duration-200 active:scale-95 flex flex-row align-left items-center  gap-4 text-secondary text-4xl font-medium"
         aria-label="Back to home"
       >
         <div className="p-3 bg-secondary rounded-full shadow-lg transition-all duration-200 active:scale-95 flex flex-row">
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            width="28"
-            height="28"
+            width="32"
+            height="32"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
-            className="text-white"
+            className="text-primary"
           >
             <path d="M19 12H5M12 19l-7-7 7-7" />
           </svg>
         </div>
         Back
       </button>
-      <div className="relative z-10 w-full px-24 flex flex-col items-center gap-12">
-        <h1 className="text-5xl lg:text-6xl font-bold font-sans text-center">
-          Choose Your Look
+      <div className="relative z-10 w-full px-24 flex flex-col items-center gap-12 mb-40">
+        <h1 className="text-7xl font-shell font-black font-bold font-sans text-center w-180">
+          Who do you want to be today?
         </h1>
-        <div className="flex flex-col gap-8 w-full">
+        <p className="text-5xl font-medium pt-8 py-20">
+          Choose your racing role:
+        </p>
+        <div className="flex flex-col gap-18 w-full">
           {(Object.keys(RACING_THEMES) as RacingTheme[]).map((themeKey) => {
             const theme = RACING_THEMES[themeKey];
             return (
               <button
                 key={themeKey}
                 onClick={() => handleSelectTheme(themeKey)}
-                className="relative w-full rounded-2xl overflow-hidden shadow-xl cursor-pointer transition-all duration-200 active:scale-[0.98] hover:shadow-2xl select-none"
+                className="relative w-full rounded-4xl overflow-hidden cursor-pointer transition-all duration-200 active:scale-[0.98] hover:shadow-2xl select-none font-shell font-medium"
               >
-                <div className="relative w-full h-64 lg:h-80 bg-secondary/20">
-                  <img
-                    src={getAssetPath(THEME_IMAGES[themeKey])}
-                    alt={theme.title}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      e.currentTarget.style.display = "none";
-                    }}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-                  <div className="absolute bottom-0 left-0 right-0 p-6 text-white text-left">
-                    <h2 className="text-4xl lg:text-5xl font-bold font-sans">
-                      {theme.title}
-                    </h2>
-                    <p className="text-xl lg:text-2xl font-sans mt-1 opacity-90">
-                      {theme.description}
-                    </p>
+                <div className="relative flex flex-row items-center gap-14 w-full bg-tertiary">
+                  <div className="bg-white p-4">
+                    <img
+                      src={getAssetPath(THEME_IMAGES[themeKey])}
+                      alt={theme.title}
+                      className="w-28 h-28"
+                      onError={(e) => {
+                        e.currentTarget.style.display = "none";
+                      }}
+                    />
                   </div>
+                  <h2 className="text-7xl text-white">{theme.title}</h2>
                 </div>
               </button>
             );

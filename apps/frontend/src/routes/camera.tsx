@@ -379,7 +379,7 @@ function CameraPage() {
         <div className="z-10 absolute bottom-100 left-1/2 -translate-x-1/2 -translate-y-1/2 cursor-pointer flex items-center justify-center gap-8 lg:gap-16 w-full">
           <button
             onClick={handleRetake}
-            className="flex flex-col items-center gap-2 cursor-pointer disabled:opacity-100 disabled:cursor-not-allowed select-none"
+            className="flex flex-col items-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed select-none"
             aria-label="Retake photo"
             disabled={
               capturedPhotos.length <= 0 || retakeCount >= MAX_RETAKE_COUNT
@@ -396,7 +396,7 @@ function CameraPage() {
               alt="Retake"
               className="size-32 object-contain"
             />
-            <span className="text-white font-medium text-2xl lg:text-3xl absolute -bottom-4 font-sans">
+            <span className="text-white text-2xl lg:text-3xl absolute -bottom-4">
               Retake
             </span>
           </button>
@@ -426,7 +426,7 @@ function CameraPage() {
           </button>
           <button
             onClick={handleNext}
-            className="flex flex-col items-center gap-2 cursor-pointer disabled:opacity-100 disabled:cursor-not-allowed select-none"
+            className="flex flex-col items-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed select-none"
             aria-label="Next"
             disabled={capturedPhotos.length < 1}
             onKeyDown={(e) => {
@@ -441,7 +441,7 @@ function CameraPage() {
               alt="Next"
               className="size-32 object-contain"
             />
-            <span className="text-white font-medium text-2xl lg:text-3xl absolute -bottom-4 font-sans">
+            <span className="text-white text-2xl lg:text-3xl absolute -bottom-4">
               Next
             </span>
           </button>

@@ -10,17 +10,17 @@ export const RACING_THEMES: Record<
     description: string;
   }
 > = {
-  pitcrew: {
-    title: "Pit Crew",
-    description: "Join the elite racing support team",
-  },
   motogp: {
-    title: "MotoGP Racer",
+    title: "MotoGP Rider",
     description: "Feel the speed on two wheels",
   },
   f1: {
-    title: "F1 Racer",
+    title: "F1 Driver",
     description: "Experience Formula 1 glory",
+  },
+  pitcrew: {
+    title: "Race Engineer",
+    description: "Join the elite racing support team",
   },
 };
 
