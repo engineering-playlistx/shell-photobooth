@@ -16,12 +16,10 @@ const TEMPLATE_URLS: Record<RacingTheme, string | undefined> = {
 const DEFAULT_MODEL = 'google/nano-banana-pro'
 const REPLICATE_MODEL = process.env.REPLICATE_MODEL || DEFAULT_MODEL
 
-const THEME_PROMPTS: Record<RacingTheme, string> = {
-  pitcrew:
-    'Insert the face of the person from the first image onto the body of the person in the second image. Keep the pit crew outfit, background, and pose exactly the same. Make it look natural and photorealistic.',
-  motogp:
-    'Insert the face of the person from the first image onto the body of the person in the second image. Keep the MotoGP racing suit, background, and pose exactly the same. Make it look natural and photorealistic.',
-  f1: 'Insert the face of the person from the first image onto the body of the person in the second image. Keep the F1 racing suit, background, and pose exactly the same. Make it look natural and photorealistic.',
+const THEME_PROMPTS: Record<RacingTheme, string | undefined> = {
+  pitcrew: process.env.RACING_PROMPT_PITCREW,
+  motogp: process.env.RACING_PROMPT_MOTOGP,
+  f1: process.env.RACING_PROMPT_F1,
 }
 
 export class AIGenerationService {
@@ -44,6 +42,9 @@ export class AIGenerationService {
     }
 
     const prompt = THEME_PROMPTS[params.theme]
+    if (!prompt) {
+      throw new Error(`Prompt not configured for theme: ${params.theme}`)
+    }
 
     console.log(`[AIService] Calling Replicate model: ${REPLICATE_MODEL}`)
     console.log(`[AIService] Theme: ${params.theme}`)
