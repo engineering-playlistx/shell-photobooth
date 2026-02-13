@@ -332,24 +332,29 @@ ipcMain.handle("print-window", async (_event, filePath: string) => {
       <head>
         <style>
           @page {
-            margin: 0
+            margin: 0;
           }
+
           * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
           }
+
           body {
-            width: 4.1in;
-            height: 6.1in;
-            margin: 0;
-            padding: 0;
+            width: 4.05in;
+            height: 6.05in;
+            position: relative;
+            background: black;
           }
+
           img {
-            width: 100%;
+            position: absolute;
+            top: 0.756in;
+            left: 50%;
+            transform: translateX(-50%) rotate(90deg);
+            width: 2.15in;
             height: auto;
-            display: block;
-            object-fit: cover;
           }
         </style>
       </head>
