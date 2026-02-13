@@ -9,14 +9,15 @@ import { supabase } from "../utils/supabase";
 import { getAssetPath } from "../utils/assets";
 import { usePrint } from "../hooks/usePrint";
 import { savePhotoFile, savePhotoResult } from "../utils/database";
+import QRCodeModal from "../components/QRCodeModal";
 
-// TODO: Fix eslint
-const API_BASE_URL =
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (import.meta as any).env?.VITE_API_BASE_URL || "http://localhost:3000";
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const API_CLIENT_KEY = (import.meta as any).env?.VITE_API_CLIENT_KEY || "";
-// TODO: Move to environment variables
+// // Email feature - commented out
+// const API_BASE_URL =
+//   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+//   (import.meta as any).env?.VITE_API_BASE_URL || "http://localhost:3000";
+// // eslint-disable-next-line @typescript-eslint/no-explicit-any
+// const API_CLIENT_KEY = (import.meta as any).env?.VITE_API_CLIENT_KEY || "";
+
 const SUPABASE_BUCKET = "photobooth-bucket";
 const SUPABASE_FOLDER = "public";
 
@@ -40,7 +41,9 @@ export default function ResultPage() {
   const { finalPhoto, selectedTheme, userInfo } = usePhotobooth();
   const navigate = useNavigate();
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [qrUrl, setQrUrl] = useState<string | null>(null);
+  const [showQrModal, setShowQrModal] = useState(false);
   const hasSaved = useRef(false);
   const [savedPhotoPath, setSavedPhotoPath] = useState<string | null>(null);
   const photoUuid = useMemo(() => crypto.randomUUID(), []);
@@ -59,138 +62,62 @@ export default function ResultPage() {
     setToasts((prev) => prev.filter((toast) => toast.id !== id));
   };
 
-  // const downloadPhoto = () => {
-  //   if (!finalPhoto || !userInfo) {
-  //     addToast("Photo or user information is missing.", "error");
-  //     return;
-  //   }
+  // Email feature - commented out
+  // const emailResult = async () => { ... };
 
-  //   try {
-  //     const blob = base64ToBlob(finalPhoto, "image/png");
-  //     const url = URL.createObjectURL(blob);
-
-  //     const a = document.createElement("a");
-  //     a.href = url;
-  //     a.download = photoFileName;
-  //     a.style.display = "none";
-  //     document.body.appendChild(a);
-  //     const clickEvent = new MouseEvent("click", {
-  //       bubbles: true,
-  //       cancelable: true,
-  //       view: window,
-  //     });
-  //     a.dispatchEvent(clickEvent);
-
-  //     setTimeout(() => {
-  //       document.body.removeChild(a);
-  //       URL.revokeObjectURL(url);
-  //     }, 200);
-  //   } catch (error) {
-  //     console.error("Error downloading photo:", error);
-  //     addToast("Failed to download photo. Please try again.", "error");
-  //   }
-  // };
-
-  const emailResult = async () => {
-    if (!finalPhoto || !selectedTheme || !userInfo) return;
-
-    setIsSubmitting(true);
+  const uploadToSupabaseAndShowQR = async () => {
+    if (!finalPhoto) {
+      addToast("Photo is missing.", "error");
+      return;
+    }
 
     try {
-      const MAX_FILE_SIZE = 5 * 1024 * 1024;
-      const ALLOWED_TYPES = ["image/png", "image/jpeg", "image/jpg"];
-
-      const base64Match = finalPhoto.match(
-        /^data:([a-zA-Z0-9]+\/[a-zA-Z0-9-.+]+);base64,(.+)$/,
-      );
-      if (!base64Match) {
-        addToast("Invalid image format.", "error");
-        setIsSubmitting(false);
-        return;
-      }
-
-      const mimeType = base64Match[1];
-      if (!ALLOWED_TYPES.includes(mimeType)) {
-        addToast(
-          "Invalid image format. Only PNG and JPEG are allowed.",
-          "error",
-        );
-        setIsSubmitting(false);
-        return;
-      }
-
-      const base64String = base64Match[2];
-      const fileSize = (base64String.length * 3) / 4;
-      if (fileSize > MAX_FILE_SIZE) {
-        addToast(
-          `File size exceeds ${MAX_FILE_SIZE / 1024 / 1024}MB limit.`,
-          "error",
-        );
-        setIsSubmitting(false);
-        return;
-      }
-
-      const blob = base64ToBlob(finalPhoto, mimeType);
+      const blob = base64ToBlob(finalPhoto, "image/png");
       const filePath = `${SUPABASE_FOLDER}/${photoFileName}`;
 
       const { error: uploadError } = await supabase.storage
         .from(SUPABASE_BUCKET)
         .upload(filePath, blob, {
-          contentType: mimeType,
-          upsert: false,
+          contentType: "image/png",
+          upsert: true,
         });
 
-      if (
-        uploadError &&
-        uploadError.message !== "The resource already exists"
-      ) {
+      if (uploadError) {
         console.error("Supabase upload error:", uploadError);
         addToast("Failed to upload photo. Please try again.", "error");
-        setIsSubmitting(false);
         return;
       }
 
-      const response = await fetch(`${API_BASE_URL}/api/photo`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${API_CLIENT_KEY}`,
-        },
-        body: JSON.stringify({
-          photoPath: filePath,
-          name: userInfo.name,
-          email: userInfo.email,
-          phone: userInfo.phone,
-          selectedTheme: selectedTheme?.theme,
-        }),
-      });
+      const { data } = supabase.storage
+        .from(SUPABASE_BUCKET)
+        .getPublicUrl(filePath);
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        await supabase.storage.from(SUPABASE_BUCKET).remove([filePath]);
-        addToast(
-          data.error || "Failed to submit photo. Please try again.",
-          "error",
-        );
-        return;
-      }
-
-      addToast("Photo sent successfully! Check your email.", "success");
+      setQrUrl(data.publicUrl);
+      setShowQrModal(true);
     } catch (error) {
-      console.error("Error submitting photo:", error);
-      addToast(
-        "Network error. Please check your connection and try again.",
-        "error",
-      );
+      console.error("Error uploading photo:", error);
+      addToast("Failed to generate download link. Please try again.", "error");
+    }
+  };
+
+  const handlePrintAndDownload = async () => {
+    if (!finalPhoto) {
+      addToast("Photo is missing.", "error");
+      return;
+    }
+
+    setIsProcessing(true);
+    try {
+      // Fire print and upload in parallel
+      void handlePrint();
+      await uploadToSupabaseAndShowQR();
     } finally {
-      setIsSubmitting(false);
+      setIsProcessing(false);
     }
   };
 
   // printing feature
   const { print } = usePrint();
-  const hasAutoPrinted = useRef(false);
 
   const handlePrint = async () => {
     try {
@@ -214,12 +141,6 @@ export default function ResultPage() {
     }
   };
 
-  const handlePrintDownloadButtonClicked = () => {
-    void handlePrint();
-  };
-
-  // No longer needed - auto-print is now triggered after photo is saved to disk
-
   // Auto-save photo result to database when page loads
   useEffect(() => {
     if (hasSaved.current || !finalPhoto || !selectedTheme || !userInfo) {
@@ -240,30 +161,6 @@ export default function ResultPage() {
         });
 
         console.log("Photo result saved to database successfully");
-
-        // Auto-print after photo is saved to disk (with delay to ensure file is written)
-        if (!hasAutoPrinted.current) {
-          hasAutoPrinted.current = true;
-          setTimeout(() => {
-            void (async () => {
-              try {
-                const result = await print(photoPath);
-                if (result.success) {
-                  console.log("Auto-print successful!");
-                  if (result.filepath) {
-                    console.log("pdf saved to:", result.filepath);
-                  }
-                } else {
-                  console.error("Auto-print failed:", result.error);
-                  addToast(`Print failed: ${result.error}`, "error");
-                }
-              } catch (error) {
-                console.error("Auto-print error", error);
-                addToast(`Print error`, "error");
-              }
-            })();
-          }, 1000); // 1 second delay
-        }
       } catch (error) {
         console.error("Failed to save photo result to database:", error);
         addToast(
@@ -306,17 +203,17 @@ export default function ResultPage() {
           <button
             type="button"
             className="mt-12 mb-6 w-full text-5xl px-7 py-5 bg-tertiary text-white rounded-lg font-medium transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed select-none"
-            onClick={() => void emailResult()}
-            disabled={isSubmitting}
+            onClick={() => void handlePrintAndDownload()}
+            disabled={isProcessing}
           >
-            {isSubmitting ? "Submitting..." : "Print & Download"}
+            {isProcessing ? "Processing..." : "Print & Download"}
           </button>
 
           <div className="text-center text-4xl grid grid-cols-2 gap-6 w-full">
             <button
               type="button"
               className="px-7 py-3 bg-white text-secondary rounded-lg font-medium transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed select-none"
-              onClick={() => void handlePrintDownloadButtonClicked()}
+              onClick={() => void navigate("/")}
             >
               Retry Result
             </button>
@@ -327,25 +224,15 @@ export default function ResultPage() {
             >
               Back to Home
             </button>
-            {/* {process.env.NODE_ENV === "development" && (
-              <button
-                type="button"
-                className="px-7 py-5 bg-white text-secondary rounded-lg font-medium text-5xl transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed select-none"
-                onClick={downloadPhoto}
-              >
-                Download
-              </button>
-            )} */}
-            {/* {process.env.NODE_ENV === "development" && (
-              <button
-                type="button"
-                className="px-7 py-5 bg-white text-secondary rounded-lg font-medium text-5xl transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed select-none"
-                onClick={() => void handlePrintButtonClicked()}
-              >
-                Print
-              </button>
-            )} */}
           </div>
+
+          {qrUrl && (
+            <QRCodeModal
+              url={qrUrl}
+              isOpen={showQrModal}
+              onClose={() => setShowQrModal(false)}
+            />
+          )}
         </div>
       </div>
     </div>
