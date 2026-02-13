@@ -34,7 +34,9 @@ async function applyRacingFrame(
   aiGeneratedBase64: string,
   theme: RacingTheme,
 ): Promise<string> {
-  const canvasWidth = 1280;
+  // for 4 x 6 = 1280 x 1920
+  // shell custom ID card = 54 x 86 = 1205 x 1920
+  const canvasWidth = 1205;
   const canvasHeight = 1920;
 
   const canvas = document.createElement("canvas");
