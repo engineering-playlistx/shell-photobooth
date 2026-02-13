@@ -59,37 +59,37 @@ export default function ResultPage() {
     setToasts((prev) => prev.filter((toast) => toast.id !== id));
   };
 
-  const downloadPhoto = () => {
-    if (!finalPhoto || !userInfo) {
-      addToast("Photo or user information is missing.", "error");
-      return;
-    }
+  // const downloadPhoto = () => {
+  //   if (!finalPhoto || !userInfo) {
+  //     addToast("Photo or user information is missing.", "error");
+  //     return;
+  //   }
 
-    try {
-      const blob = base64ToBlob(finalPhoto, "image/png");
-      const url = URL.createObjectURL(blob);
+  //   try {
+  //     const blob = base64ToBlob(finalPhoto, "image/png");
+  //     const url = URL.createObjectURL(blob);
 
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = photoFileName;
-      a.style.display = "none";
-      document.body.appendChild(a);
-      const clickEvent = new MouseEvent("click", {
-        bubbles: true,
-        cancelable: true,
-        view: window,
-      });
-      a.dispatchEvent(clickEvent);
+  //     const a = document.createElement("a");
+  //     a.href = url;
+  //     a.download = photoFileName;
+  //     a.style.display = "none";
+  //     document.body.appendChild(a);
+  //     const clickEvent = new MouseEvent("click", {
+  //       bubbles: true,
+  //       cancelable: true,
+  //       view: window,
+  //     });
+  //     a.dispatchEvent(clickEvent);
 
-      setTimeout(() => {
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-      }, 200);
-    } catch (error) {
-      console.error("Error downloading photo:", error);
-      addToast("Failed to download photo. Please try again.", "error");
-    }
-  };
+  //     setTimeout(() => {
+  //       document.body.removeChild(a);
+  //       URL.revokeObjectURL(url);
+  //     }, 200);
+  //   } catch (error) {
+  //     console.error("Error downloading photo:", error);
+  //     addToast("Failed to download photo. Please try again.", "error");
+  //   }
+  // };
 
   const emailResult = async () => {
     if (!finalPhoto || !selectedTheme || !userInfo) return;
@@ -214,7 +214,7 @@ export default function ResultPage() {
     }
   };
 
-  const handlePrintButtonClicked = () => {
+  const handlePrintDownloadButtonClicked = () => {
     void handlePrint();
   };
 
@@ -287,36 +287,47 @@ export default function ResultPage() {
         }}
       />
       <div className="relative z-10 w-full px-36 mx-auto mb-40">
-        <div className="flex flex-col items-center gap-8">
-          <h1 className="text-8xl font-black text-tertiary">Ready to Race!</h1>
-          <div className="w-full h-[1200px] py-4">
+        <div className="flex flex-col items-center gap-0">
+          <h1 className="text-8xl font-black text-tertiary mt-0 mb-14">
+            Ready to Race!
+          </h1>
+          <div className="w-175">
             {!!finalPhoto && !!selectedTheme && (
               <img
                 src={finalPhoto}
                 // src="/images/_for-testing/frame-1.png"
                 alt="Final photo"
                 // add print area class for printing
-                className="w-full h-auto rounded-lg shadow-lg print-area"
+                className="w-full h-auto rounded-xl shadow-md print-area border border-black/30 border-1"
               />
             )}
           </div>
-          <div className="text-center grid grid-cols-2 gap-8 w-full">
+
+          <button
+            type="button"
+            className="mt-12 mb-6 w-full text-5xl px-7 py-5 bg-tertiary text-white rounded-lg font-medium transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed select-none"
+            onClick={() => void emailResult()}
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "Submitting..." : "Print & Download"}
+          </button>
+
+          <div className="text-center text-4xl grid grid-cols-2 gap-6 w-full">
             <button
               type="button"
-              className="px-7 py-5 bg-white text-secondary rounded-lg font-medium text-5xl transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed select-none"
+              className="px-7 py-3 bg-white text-secondary rounded-lg font-medium transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed select-none"
+              onClick={() => void handlePrintDownloadButtonClicked()}
+            >
+              Retry Result
+            </button>
+            <button
+              type="button"
+              className="px-7 py-3 bg-white text-secondary rounded-lg font-medium transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed select-none"
               onClick={() => void navigate("/")}
             >
               Back to Home
             </button>
-            <button
-              type="button"
-              className="px-7 py-5 bg-tertiary text-white rounded-lg font-medium text-5xl transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed select-none"
-              onClick={() => void emailResult()}
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? "Submitting..." : "Email Result"}
-            </button>
-            {process.env.NODE_ENV === "development" && (
+            {/* {process.env.NODE_ENV === "development" && (
               <button
                 type="button"
                 className="px-7 py-5 bg-white text-secondary rounded-lg font-medium text-5xl transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed select-none"
@@ -324,8 +335,8 @@ export default function ResultPage() {
               >
                 Download
               </button>
-            )}
-            {process.env.NODE_ENV === "development" && (
+            )} */}
+            {/* {process.env.NODE_ENV === "development" && (
               <button
                 type="button"
                 className="px-7 py-5 bg-white text-secondary rounded-lg font-medium text-5xl transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed select-none"
@@ -333,7 +344,7 @@ export default function ResultPage() {
               >
                 Print
               </button>
-            )}
+            )} */}
           </div>
         </div>
       </div>
