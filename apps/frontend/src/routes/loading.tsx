@@ -11,6 +11,15 @@ const API_BASE_URL =
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const API_CLIENT_KEY = (import.meta as any).env?.VITE_API_CLIENT_KEY || "";
 
+// --- Photo positioning inside the final canvas ---
+// Adjusted photo size here
+// based on the frame design
+const PHOTO_WIDTH = 1004;
+const PHOTO_HEIGHT = 1507;
+// Offset from the centered position (px). Positive = right/down, negative = left/up.
+const PHOTO_OFFSET_X = 0;
+const PHOTO_OFFSET_Y = 0;
+
 const FRAME_MAP: Record<RacingTheme, string> = {
   pitcrew: "/images/frame-racing-pitcrew.png",
   motogp: "/images/frame-racing-motogp.png",
@@ -49,7 +58,11 @@ async function applyRacingFrame(
   }
 
   const aiImage = await loadImage(aiGeneratedBase64);
-  ctx.drawImage(aiImage, 0, 0, canvasWidth, canvasHeight);
+  const photoWidth = PHOTO_WIDTH;
+  const photoHeight = PHOTO_HEIGHT;
+  const photoX = (canvasWidth - photoWidth) / 2 + PHOTO_OFFSET_X;
+  const photoY = (canvasHeight - photoHeight) / 2 + PHOTO_OFFSET_Y;
+  ctx.drawImage(aiImage, photoX, photoY, photoWidth, photoHeight);
 
   // Frame overlay is optional — skip if the image file doesn't exist
   try {
@@ -88,7 +101,7 @@ function LoadingPage() {
         );
         console.log(`[AI Generate] API URL: ${API_BASE_URL}/api/ai-generate`);
 
-        setStatusText("Uploading photo...");
+        setStatusText("Suiting you up...");
         setProgress(15);
 
         const startTime = Date.now();
